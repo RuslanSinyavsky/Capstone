@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+#Hi
 
 img = cv2.imread(r"C:\Users\gelfa\Desktop\test1.png",0)
 img = cv2.medianBlur(img,5)
