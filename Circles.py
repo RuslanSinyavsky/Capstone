@@ -1,14 +1,13 @@
-from cv2 import cv2
+import cv2
 import numpy as np
-#Hi
-#Test
 
-img = cv2.imread(r"C:\Users\gelfa\Desktop\test1.png",0)
+
+img = cv2.imread(r"C:\Users\Ruslan\Desktop\test1.png",0)
 img = cv2.medianBlur(img,5)
 cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 
-circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,20,
-                           param1=50,param2=60,minRadius=0,maxRadius=0)
+circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,1,300,
+                           param1=40,param2=200,minRadius=0,maxRadius=0)
 
 circles = np.uint16(np.around(circles))
 for i in circles[0,:]:
@@ -20,5 +19,3 @@ for i in circles[0,:]:
 cv2.imshow('detected circles',cimg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-msg = "hi again"
-#wtf is this shit???
