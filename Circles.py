@@ -21,7 +21,7 @@ def detectFluores(image):
     return img
 
 
-img = cv2.imread(r"C:\Users\Ruslan\Desktop\test1.png", 0)
+img = cv2.imread(r"C:\Users\gelfa\Desktop\test1.png", 0)
 img = cv2.medianBlur(img,5)
 cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 
