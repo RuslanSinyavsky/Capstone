@@ -6,8 +6,8 @@ def detectFluores(image):
     gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 #convert gray image to 8UC1 format
     gray8UC1 = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow('Output gray', gray8UC1)
-    # cv2.waitKey(0)
+    cv2.imshow('Output gray', gray8UC1)
+    cv2.waitKey(0)
 
     #extract binary
     ret, thresh1 = cv2.threshold(gray8UC1, 55, 255, cv2.THRESH_BINARY)
