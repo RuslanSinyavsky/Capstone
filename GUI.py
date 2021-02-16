@@ -32,10 +32,10 @@ def Setting():
     main.IncubationTime(int(nb_pics_entry.get()), int(time_entry.get()))
     main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), int(maxdrop_entry.get()))
 
-    print("nb of pics entered: ", nb_pics_entry.get())
-    print("time entered: ", time_entry.get())
-    print("max size entered: ", maxdrop_entry.get())
-    print("min size entered: ", mindrop_entry.get())
+    #print("nb of pics entered: ", nb_pics_entry.get())
+    #print("time entered: ", time_entry.get())
+    #print("max size entered: ", maxdrop_entry.get())
+    #print("min size entered: ", mindrop_entry.get())
 
     def imagingStart():
         start_btn.config(state=DISABLED)
