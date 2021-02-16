@@ -21,9 +21,9 @@ def detectFluores(image):
     return img
 
 
-img = cv2.imread(r"C:\Users\gelfa\Desktop\test1.png", 0)
-img = cv2.medianBlur(img,5)
-cimg = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
+img = cv2.imread(r"C:\Users\mperl\Desktop\test1.png", 0)
+img = cv2.medianBlur(img, 5)
+cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
 detectFluores(img)
 circles = cv2.HoughCircles(img
@@ -40,3 +40,10 @@ for i in circles[0,:]:
 cv2.imshow('detected circles',cimg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
+def addWells(index, y_pos, x_pos, radius, cropped_img):
+    "adding a well to the wells array"
+    wellArray = {}
+    wellArray.insert(index, [cropped_img, y_pos, x_pos, radius])  # inserts well at a given index
+    return
