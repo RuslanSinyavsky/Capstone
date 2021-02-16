@@ -1,4 +1,6 @@
 from tkinter import *
+import Main as main
+
 
 root = Tk()
 frame = Frame(root, height=300, width=380)
@@ -26,6 +28,10 @@ mindrop_entry = Entry(root, bd=3, width=6)
 #Buttons
 
 def Setting():
+
+    main.IncubationTime(int(nb_pics_entry.get()), int(time_entry.get()))
+    main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), int(maxdrop_entry.get()))
+
     print("nb of pics entered: ", nb_pics_entry.get())
     print("time entered: ", time_entry.get())
     print("max size entered: ", maxdrop_entry.get())
