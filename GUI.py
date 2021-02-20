@@ -38,7 +38,7 @@ def Setting():
     def imagingStart():
         start_btn.config(state=DISABLED)
         #main.IncubationTime(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get())
-        main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get(), base=10), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
+        main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
 
     root2 = Tk()
     frame2 = Frame(root2, height=270, width=410)
