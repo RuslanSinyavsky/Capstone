@@ -1,6 +1,14 @@
 import cv2
 import numpy as np
 
+# GLOBAL VARIABLES
+wellArray = {} #array to store our
+
+
+
+vCircles=0; #Storing all our wells locations for re-use later, should only find this value once technically.     **set in detectWells**
+croppedImages =[] #List to store our cropped (blacked out edges) well images individually.                       **filled in isolateWells**
+
 
 def detectFluores(image):
 
@@ -24,30 +32,97 @@ def detectFluores(image):
     cv2.waitKey(0)
     return img
 
+def detectWells(img,minimumradius,maximumradius,debugbool):
+    #minimumradius default : 130
+    #maximumradius default : 180
+    minimumdistance = 150 #minimum distance between any two cells
 
-img = cv2.imread(r"C:\Users\mperl\Desktop\test1.png", 0)
-img = cv2.medianBlur(img, 5)
-cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    img = cv2.medianBlur(img, 5)
+    cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
-detectFluores(img)
-circles = cv2.HoughCircles(img
-                           ,cv2.HOUGH_GRADIENT,1,300,
-                          param1=20,param2=180,minRadius=0,maxRadius=0)
+    detectFluores(img)
+    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
+                           param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
 
-circles = np.uint16(np.around(circles))
-for i in circles[0,:]:
-#draw the outer circle
-   cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
-#draw the center of the circle
-   cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
+    circles = np.uint16(np.around(circles))
+    if debugbool ==True:
+        #if we're debugging print out the circles over the image
+        for i in circles[0,:]:
+        #draw the outer circle
+           cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
+        #draw the center of the circle
+           cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
 
-cv2.imshow('detected circles',cimg)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    global vCircles
+    vCircles=circles   #add our Circle locations into global circles variable
+
+
+def isolateWells(img):
+    global vCircles
+    circles =vCircles
+    cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    global croppedImages
+    for i in circles[0, :]:
+        # draw the outer circle
+        cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 1)
+        # i[0] & i[1] are x,Y coords of center point
+        # i[2] is radius
+
+        # Arrayofwells = DefineArray[ArrayOfWells,i[0],i[1],i[2]]
+
+        # draw the center of the circle
+        cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+        # Draw index #
+        # cv2.putText(cimg, '{}'.format(pos), (i[0],i[1]), font, 1, (0, 255, 0), 2, cv2.LINE_AA) #REMOVED FOR CONFLICT WITH CONTOUR LOWER DOWN
+        # Crop image
+        centerx = int(i[0])
+        centery = int(i[1])
+        radius = int(i[2])
+
+        lowery = centery + radius
+        uppery = centery - radius
+        lowerx = centerx + radius
+        upperx = centerx - radius
+        if lowery < 0:
+            lowery = 0
+        if lowerx < 0:
+            lowerx = 0
+        if uppery < 0:
+            uppery = 0
+        if upperx < 0:
+            upperx = 0
+
+        croppedImage_numbered = cimg[uppery:lowery, upperx:lowerx].copy()
+        croppedImage_raw = img[uppery:lowery, upperx:lowerx].copy()
+        gray8UC1 = cv2.cvtColor(croppedImage_numbered, cv2.COLOR_BGR2GRAY)
+
+        ret, thresh1 = cv2.threshold(gray8UC1, 30, 255, cv2.THRESH_BINARY)
+        contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        img2 = cv2.drawContours(croppedImage_raw, contours, -1, (0, 255, 0), 3) #outer edge
+
+
+        contours, hierarchy = cv2.findContours(gray8UC1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        img3 = cv2.drawContours(croppedImage_numbered, contours, -1, (0, 255, 0), 1)
+
+        gray = cv2.cvtColor(img3, cv2.COLOR_BGR2GRAY)
+        ret, thresh2 = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+        cnts = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+
+        cv2.drawContours(thresh2,cnts,4,(255,255,255),cv2.FILLED) #our MASK
+
+        # Generate mask
+
+
+        maskedImage = cv2.bitwise_and(croppedImage_raw, thresh2) ### THE FINAL CROPPED IMAGE WITH BLACK BACKGROUND
+        croppedImages.append(maskedImage)
+        pos = pos + 1
+
 
 
 def addWells(index, y_pos, x_pos, radius, cropped_img):
+
     "adding a well to the wells array"
-    wellArray = {}
     wellArray.insert(index, [cropped_img, y_pos, x_pos, radius])  # inserts well at a given index
     return
