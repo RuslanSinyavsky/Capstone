@@ -1,7 +1,9 @@
 import math,time
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-import detectionAlgo as fluor_detection
+import PycroManagerCoreControl as pycrocontrol
+import Circles as detection
+import detectionAlgo as algo
 
 
 # iteration = 0 #nb of times a picture was taken
@@ -44,6 +46,30 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
     #------
     #do our first image acquisition here
+    image = pycrocontrol.acquireImage()
+    detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
+    detection.isolateWells(image) #creates array of isolated well images
+
+    for i in detection.croppedImages[0,:]: ##might need to loop through circles instead of croppedimages
+        dropletsinside =  algo.detectDroplets(detection.croppedImages[i])
+
+        if len(dropletsinside) > 1:
+            #do nothing because well is invalid due to having more than 1 droplet
+
+        else:
+            #detect filaments
+
+            #get pixel count of filament
+
+            #get total pixel count of well
+
+            #Divide filametnpixel/wellpixel to get ratio aka how large it is in proportion to well
+
+
+
+
+
+
 
 
     #------
