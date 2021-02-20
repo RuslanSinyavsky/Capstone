@@ -52,7 +52,7 @@ def RunSetup(nb_pics, time, unit, max_size, min_size):
         if datetime.now() > end_time:
             print('finished')
             FluorGraph(time,end_time_unit,unit)
-            FilGraph(time,end_time_unit,unit)
+            #FilGraph(time,end_time_unit,unit)
 
 def FluorGraph(time,end_time,unit):
     #x-axis values
@@ -62,7 +62,7 @@ def FluorGraph(time,end_time,unit):
     #corresponding y axis values
     xrow=[]
     for i in range(0,x):
-        xrow.append(i)
+        xrow.append(i*time)
         print(i)
     y = [1,4,7] ### test value
 
