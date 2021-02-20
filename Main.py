@@ -41,8 +41,10 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         end_time_unit = end_time.hour - start_time.hour
         print("unit received:", unit)
     timelast = start_time
+
     #------
     #do our first image acquisition here
+
 
     #------
 

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from Circles import croppedImages
 
 def intensityFluores(image):
 
@@ -33,3 +34,14 @@ def sizeGrowth(image):
     pixelCountValue = cv2.countNonZero(thresh1)
 
     return pixelCountValue
+
+def detectDroplets(c_img):
+
+    minimumradius = 130
+    maximumradius = 180
+    minimumdistance = 150 #minimum distance between any two cells
+
+    circles = cv2.HoughCircles(c_img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
+                               param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
+    circles = np.uint16(np.around(circles))
+    return circles
