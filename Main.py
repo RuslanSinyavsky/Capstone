@@ -42,7 +42,24 @@ def RunSetup(nb_pics, time, unit, max_size, min_size):
         print("unit received:", unit)
 
     while datetime.now() < end_time:
+        timelast =start_time
         print("in time loop")
+
+        if unit == 's':
+           if timelast.second - datetime.now().second >= time:
+               #do stuff
+               timelast = datetime.now()
+
+        if unit == 'min':
+            if timelast.minute - datetime.now().minute >= time:
+                #do stuff
+                timelast = datetime.now()
+
+        if unit == 'hrs':
+            if timelast.hour - datetime.now().hour >= time:
+                #do stuff
+                timelast = datetime.now()
+
 
         if datetime.now() > end_time:
             print('finished')
