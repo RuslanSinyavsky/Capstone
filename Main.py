@@ -1,7 +1,7 @@
-import math,time
+import math, time
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-import PycroManagerCoreControl as pycrocontrol
+# import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 
@@ -29,11 +29,12 @@ import detectionAlgo as algo
 
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     start_time = datetime.now()
+    end_time = 0
     end_time_unit = 0
     if unit == 's':
         end_time = start_time + timedelta(seconds=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.second - start_time.second
-        print("unit received:", unit)
+        print("unit received:", end_time_unit)
     if unit == 'min':
         end_time = start_time + timedelta(minutes=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.minute - start_time.minute
@@ -44,40 +45,36 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         print("unit received:", unit)
     timelast = start_time
 
-    #------
-    #do our first image acquisition here
-    image = pycrocontrol.acquireImage()
-    detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
-    detection.isolateWells(image) #creates array of isolated well images
+    # ------
+    # do our first image acquisition here
+    #   image = pycrocontrol.acquireImage()
+    #   detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
+    #   detection.isolateWells(image) #creates array of isolated well images
 
-    for i in detection.croppedImages[0,:]: ##might need to loop through circles instead of croppedimages
-        dropletsinside =  algo.detectDroplets(detection.croppedImages[i])
+    for i in range(0, len(detection.croppedImages)):  ##might need to loop through circles instead of croppedimages
+        dropletsinside = algo.detectDroplets(detection.croppedImages[i])
 
         if len(dropletsinside) > 1:
-            #do nothing because well is invalid due to having more than 1 droplet
+            # do nothing because well is invalid due to having more than 1 droplet
+            time.sleep(0)
+
 
         else:
-            #detect filaments
 
-            #get pixel count of filament
+            # detect filaments
 
-            #get total pixel count of well
+            # get pixel count of filament
 
-            #Divide filametnpixel/wellpixel to get ratio aka how large it is in proportion to well
+            # get total pixel count of well
 
+            # Divide filametnpixel/wellpixel to get ratio aka how large it is in proportion to well
+            time.sleep(0)
 
-
-
-
-
-
-
-    #------
+    # ------
 
     while datetime.now() < end_time:
 
-    #do the rest of our image acquisitions here
-
+        # do the rest of our image acquisitions here
 
         if unit == 's':
             if datetime.now().second - timelast.second >= timeinterval:
@@ -107,7 +104,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
 def FluorGraph(timeinterval, end_time, unit):
     # x-axis values
-    print("end time: ",end_time)
+    print("end time: ", end_time)
     x = math.floor(end_time / timeinterval) + 1
     print('x: ', x)
     # corresponding y axis values
