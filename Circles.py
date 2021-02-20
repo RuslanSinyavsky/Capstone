@@ -11,6 +11,8 @@ def detectFluores(image):
 
     #extract binary
     ret, thresh1 = cv2.threshold(gray8UC1, 55, 255, cv2.THRESH_BINARY)
+    pixelCountValue = cv2.countNonZero(thresh1)
+    print(pixelCountValue)
     cv2.imshow('Output thresh', thresh1)
     cv2.waitKey(0)
 
