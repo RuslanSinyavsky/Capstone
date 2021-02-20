@@ -1,9 +1,11 @@
 from pycromanager import Acquisition, multi_d_acquisition_events, Bridge, Dataset
 from matplotlib import pyplot as plt
 import numpy as np
-import time
+import cv2
+import time, math
 import os, sys
 from PIL import Image
+
 
 bridge = Bridge()
 core = bridge.get_core()
@@ -48,63 +50,98 @@ with Acquisition(directory='E:\KENZA Folder\CapstoneTests', name='saving_name') 
 
 #data_path ='E:\KENZA Folder\CapstoneTests\saving_name_18'
 #dataset = Dataset(data_path)
-dataset2 = acq.get_dataset()
+dataset = acq.get_dataset()
 #dataset = acq.get_dataset()
 
 length=(len(xyz))
 
-def merge_images(file1, file2):
+
+def merge_imagesVertical(file1, file2):
     """Merge two images into one vertical image
-    :param file1: path to first image file
-    :param file2: path to second image file
     :return: the merged Image object
     """
     image1 = file1
     image2 = file2
+    vis=np.concatenate((image1,image2),axis=0)
+    return vis
 
-    (width1, height1) = image1.size
-    (width2, height2) = image2.size
+def merge_imagesHorizontal(file1, file2):
+    """Merge two images into one Horizontal image
+    :return: the merged Image object
+    """
+    image1 = file1
+    image2 = file2
+    vis=np.concatenate((image1,image2),axis=1)
+    return vis
 
-    # result_width = width1 + width2
-    result_width = width1
-    # result_height = max(height1, height2)
-    result_height = height1 + height2
-
-    print (height2)
-
-    result = Image.new('RGB', (result_width, result_height))
-    result.paste(im=image1, box=(0, 0))
-    result.paste(im=image2, box=(0, height1))
-    return result
-
-stitched_img = dataset2.read_image(position=0)
-img_array=[]
-
-for x_pos in range(length):
-    print(x_pos)
-    #for y_pos in range(length):
-    #print(dataset2.has_image(row=x_pos, col=y_pos))
-    img = dataset2.read_image(position=x_pos) # <---- read our z-stack index 0
-    #plt.imshow(img)  # <---- convert numpy array into image
-    #plt.show()  # <--- show us the image
-
-    img_array.append(img)
-    #stiched_img = merge_images(stitched_img, img)
-
-# creates a new empty image, RGB mode, and size 444 by 95
-new_im = Image.new('RGB', (444,95))
-
-for elem in img_array:
-    for i in xrange(0,444,95):
-        im=Image.open(elem)
-        new_im.paste(im, (i,0))
-new_im.save('test.jpg')
-
-plt.imshow(stitched_img)  # <---- convert numpy array into image
-plt.show()  # <--- show us the image
+def concat_tile(im_list_2d):
+    return cv2.vconcat([cv2.hconcat(im_list_h) for im_list_h in im_list_2d])
 
 
-#img = dataset2.read_image(row=0, col=0) # <---- read our z-stack index 0
-#plt.imshow(img)  # <---- convert numpy array into image
-#plt.show()  # <--- show us the image
+
+
+
+
+
+#stitched_img = dataset.read_image(position=0)
+#stitched_img2 = dataset.read_image(position=0)
+#globals()['string%s' % x] = 'Hello'
+
+length=16
+posrange = int(math.sqrt(length))
+posincrement = posrange
+
+#Stitchedrow1=stitched_img
+#Stitchedrow2=stitched_img
+
+#Merged1=stitched_img
+#Merged2= stitched_img
+stitched_image=[]
+toggle=0
+index=0
+itteration=0
+while index<length:
+    imgtable1 =[]
+    imgtable2 =[]
+    flippedimg=[]
+    if toggle==0: #only do this one once
+
+        for x_pos in range(index,posrange):
+            if index<length-1:
+                print(index)
+
+                img = dataset.read_image(position=index)
+                imgtable1.append(img)
+                index=index+1
+
+        newimg=cv2.vconcat(imgtable1)
+        flippedimg.append(newimg)
+        toggle=1
+        posrange=index+posincrement
+        print("Finished0")
+
+        for x_pos in range(index,posrange):
+            if index<=length:
+                print(index)
+                index=index+1
+                img = dataset.read_image(position=x_pos)
+                imgtable2.append(img)
+        imgtable2=np.flipud(imgtable2)
+        newimg=cv2.vconcat(imgtable2)
+        flippedimg.append(newimg)
+        toggle=1
+        posrange=posrange+posincrement
+        print("Finished1")
+    if toggle==1:
+        flippedimg=flippedimg[::-1]
+        flippedimg=cv2.hconcat(flippedimg)
+        stitched_image.insert(0,flippedimg) #modify this to add to bottom instead of top
+        toggle=0
+        itteration=itteration+1
+        print("FinishedCombo")
+
+imgtoshow=cv2.hconcat(stitched_image)
+plt.imshow(imgtoshow)
+plt.show()
+
 
