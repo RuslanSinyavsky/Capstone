@@ -2,10 +2,11 @@ import time
 import datetime
 from datetime import timedelta
 
-#start_time = datetime.datetime.now()
 #end_time = datetime
 
 #def IncubationTime(nb_pics, time, unit) -> datetime:
+
+#start_time = datetime.datetime.now()
 
 #    if unit == 's':
 #        end_time = start_time + timedelta(seconds=(nb_pics-1) * time)
