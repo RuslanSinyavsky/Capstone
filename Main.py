@@ -27,10 +27,11 @@ iteration = 0 #nb of times a picture was taken
 def RunSetup(nb_pics, time, unit, max_size, min_size):
     #time_unit=unit
     start_time = datetime.now()
+    end_time_unit=0
     if unit == 's':
         end_time = start_time + timedelta(seconds=(nb_pics-1) * time)
         print('end time: ',end_time)
-        end_time_unit=end_time.second
+        end_time_unit=end_time.second - start_time.second
         print('end time unit: ',end_time_unit)
         print("unit received:", unit)
     if unit == 'min':
@@ -40,11 +41,11 @@ def RunSetup(nb_pics, time, unit, max_size, min_size):
         end_time = start_time + timedelta(hours=(nb_pics-1) * time)
         print("unit received:", unit)
 
-    print("start time:", start_time)
-    print("end time:", end_time)
+    #print("start time:", start_time)
+   # print("end time:", end_time)
 
     #end_time = start_time + timedelta(seconds=(nb_pics-1) * time)
-    print(datetime.now())
+   # print(datetime.now())
     #while datetime.datetime.now() < end_time:
     while datetime.now() < end_time:
         print("in time loop")
@@ -55,13 +56,18 @@ def RunSetup(nb_pics, time, unit, max_size, min_size):
 
 def FluorGraph(time,end_time,unit):
     #x-axis values
-    x = math.floor(end_time/time)
+    x = math.floor(end_time/time) + 1
     print(end_time)
     print(x)
     #corresponding y axis values
-    y = [1,4]
+    xrow=[]
+    for i in range(0,x):
+        xrow.append(i)
+        print(i)
+    y = [1,4,7] ### test value
+
     #plotting the points
-    plt.plot(x, y)
+    plt.plot(xrow, y)
     #naming the x-axis
     plt.xlabel('Time '+ '('+ unit +')')
     #naming the y-axis
@@ -70,6 +76,7 @@ def FluorGraph(time,end_time,unit):
     plt.title('Fluorescence growth over incubation period')
     #showing the plot
     plt.show()
+    print("done plotting")
 
 def FilGraph(time,end_time,unit):
     #x-axis values
