@@ -41,11 +41,13 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         end_time_unit = end_time.hour - start_time.hour
         print("unit received:", unit)
     timelast = start_time
-
+    #------
     #do our first image acquisition here
 
+    #------
 
     while datetime.now() < end_time:
+
     #do the rest of our image acquisitions here
 
 
@@ -71,12 +73,13 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
         if datetime.now() > end_time:
             print('finished')
-            FluorGraph(time, end_time_unit, unit)
-            # FilGraph(time,end_time_unit,unit)
+            FluorGraph(timeinterval, end_time_unit, unit)
+            # FilGraph(timeinterval,end_time_unit,unit)
 
 
 def FluorGraph(timeinterval, end_time, unit):
     # x-axis values
+    print("end time: ",end_time)
     x = math.floor(end_time / timeinterval) + 1
     print('x: ', x)
     # corresponding y axis values
