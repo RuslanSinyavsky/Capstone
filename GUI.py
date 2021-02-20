@@ -10,7 +10,7 @@ enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
 maxcellsize_label = Label(root, text="Max cell size allowed (unit?): ")
-mindropsize_label = Label(root, text="Min droplet size allowed (unit?): ")
+mindropsize_label = Label(root, text="Min droplet size allowed (um): ")
 
 #Entries
 nb_pics_entry = Entry(root, bd=3, width=6)
