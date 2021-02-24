@@ -1,13 +1,14 @@
-import cv2
+from cv2 import cv2
 import numpy as np
+from PIL import Image, ImageDraw
 from Circles import croppedImages
 
 def intensityFluores(image):
 
     #CV2 doesnt like some thing need to conver grey to 8UC1 format
-    grey = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    #grey = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     #convert gray image to 8UC1 format
-    gray8UC1 = cv2.cvtColor(grey, cv2.COLOR_BGR2GRAY)
+    gray8UC1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     #cv2.imshow('Output gray', gray8UC1)
     #cv2.waitKey(0)
 
@@ -16,6 +17,7 @@ def intensityFluores(image):
     #Calculate the colored pixels to find the flourecence
     #Todo might need to change as dan doesnt like
     pixelCountValue = cv2.countNonZero(thresh1)
+
     #print(pixelCountValue)
     #cv2.imshow('Output thresh', thresh1)
     #cv2.waitKey(0)

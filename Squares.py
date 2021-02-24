@@ -6,7 +6,7 @@ from PIL import Image, ImageDraw
 # Hi
 # Test
 
-img = cv2.imread(r"C:\Users\gelfa\Desktop\test2.tif", 0)
+img = cv2.imread(r"C:\capstone\test2.tif", 0)
 img = cv2.medianBlur(img, 5)
 cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 

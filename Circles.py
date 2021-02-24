@@ -2,24 +2,21 @@ import cv2
 import numpy as np
 
 # GLOBAL VARIABLES
-wellArray = {} #array to store our
+wellArray = {}  # array to store our
 
-
-
-vCircles=0; #Storing all our wells locations for re-use later, should only find this value once technically.     **set in detectWells**
-croppedImages =[] #List to store our cropped (blacked out edges) well images individually.                       **filled in isolateWells**
+vCircles = 0;  # Storing all our wells locations for re-use later, should only find this value once technically.     **set in detectWells**
+croppedImages = []  # List to store our cropped (blacked out edges) well images individually.                       **filled in isolateWells**
 
 
 def detectFluores(image):
-
-    #CV2 doesnt like some thing
+    # CV2 doesnt like some thing
     gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    #convert gray image to 8UC1 format
+    # convert gray image to 8UC1 format
     gray8UC1 = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
     cv2.imshow('Output gray', gray8UC1)
     cv2.waitKey(0)
 
-    #extract binary
+    # extract binary
     ret, thresh1 = cv2.threshold(gray8UC1, 55, 255, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
     print(pixelCountValue)
@@ -32,39 +29,44 @@ def detectFluores(image):
     cv2.waitKey(0)
     return img
 
-def detectWells(img,minimumradius,maximumradius,debugbool):
-    #minimumradius default : 130
-    #maximumradius default : 180
-    minimumdistance = 150 #minimum distance between any two cells
+
+def detectWells(img, minimumradius, maximumradius, debugbool):
+    # minimumradius default : 130
+    # maximumradius default : 180
+    minimumdistance = 50  # minimum distance between any two cells default 150
 
     img = cv2.medianBlur(img, 5)
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
-    detectFluores(img)
+    # detectFluores(img)
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
-                           param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
+                               param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
 
     circles = np.uint16(np.around(circles))
-    if debugbool ==True:
-        #if we're debugging print out the circles over the image
-        for i in circles[0,:]:
-        #draw the outer circle
-           cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
-        #draw the center of the circle
-           cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
-
+    if debugbool == True:
+        # if we're debugging print out the circles over the image
+        for i in circles[0, :]:
+            # draw the outer circle
+            cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            # draw the center of the circle
+            cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+            #cv2.imshow("Debug detectwells",cimg)
+            #cv2.waitKey(0)
     global vCircles
-    vCircles=circles   #add our Circle locations into global circles variable
+    vCircles = circles  # add our Circle locations into global circles variable
 
 
 def isolateWells(img):
     global vCircles
-    circles =vCircles
+    circles = vCircles
+    img = cv2.medianBlur(img, 5)
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    pos=0
+
     global croppedImages
     for i in circles[0, :]:
         # draw the outer circle
-        cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 1)
+        cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 3)
         # i[0] & i[1] are x,Y coords of center point
         # i[2] is radius
 
@@ -98,11 +100,10 @@ def isolateWells(img):
 
         ret, thresh1 = cv2.threshold(gray8UC1, 30, 255, cv2.THRESH_BINARY)
         contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        img2 = cv2.drawContours(croppedImage_raw, contours, -1, (0, 255, 0), 3) #outer edge
-
+        img2 = cv2.drawContours(croppedImage_raw, contours, -1, (0, 255, 0), 3)  # outer edge
 
         contours, hierarchy = cv2.findContours(gray8UC1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        img3 = cv2.drawContours(croppedImage_numbered, contours, -1, (0, 255, 0), 1)
+        img3 = cv2.drawContours(croppedImage_numbered, contours, -1, (0, 255, 0), 3)
 
         gray = cv2.cvtColor(img3, cv2.COLOR_BGR2GRAY)
         ret, thresh2 = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
@@ -110,19 +111,23 @@ def isolateWells(img):
         cnts = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
-        cv2.drawContours(thresh2,cnts,4,(255,255,255),cv2.FILLED) #our MASK
+        cv2.drawContours(thresh2, cnts, 4, (255, 255, 255), cv2.FILLED)  # our MASK
 
         # Generate mask
 
-
-        maskedImage = cv2.bitwise_and(croppedImage_raw, thresh2) ### THE FINAL CROPPED IMAGE WITH BLACK BACKGROUND
+        mask = np.zeros_like(img)
+        mask = cv2.circle(mask, (i[0], i[1]), i[2], (255, 255, 255), -1)
+        croppedmask = mask[uppery:lowery, upperx:lowerx].copy()
+        maskedImage = cv2.bitwise_and(croppedImage_raw, croppedmask)  ### THE FINAL CROPPED IMAGE WITH BLACK BACKGROUND
         croppedImages.append(maskedImage)
         pos = pos + 1
 
-
+        ##DEBUG PRINTOUT
+        cv2.imshow("Debug isolatewells",maskedImage)
+        cv2.waitKey(0)
+        ##DEBUG END
 
 def addWells(index, y_pos, x_pos, radius, cropped_img):
-
     "adding a well to the wells array"
     wellArray.insert(index, [cropped_img, y_pos, x_pos, radius])  # inserts well at a given index
     return
