@@ -10,25 +10,34 @@ croppedImages = []  # List to store our cropped (blacked out edges) well images 
 
 def detectFluores(image):
     # CV2 doesnt like some thing
-    gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    #gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     # convert gray image to 8UC1 format
-    gray8UC1 = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+    gray8UC1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     cv2.imshow('Output gray', gray8UC1)
     cv2.waitKey(0)
 
     # extract binary
-    ret, thresh1 = cv2.threshold(gray8UC1, 55, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(gray8UC1, 25, 255, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
     print(pixelCountValue)
     cv2.imshow('Output thresh', thresh1)
     cv2.waitKey(0)
 
     contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    img = cv2.drawContours(thresh1, contours, -1, (0, 255, 0), 3)
+    img = cv2.drawContours(image, contours, -1, (255, 255, 255), 2)
     cv2.imshow('Output', img)
     cv2.waitKey(0)
-    return img
+    gray8UC1_test = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret1, thresh12 = cv2.threshold(gray8UC1_test, 254, 255, cv2.THRESH_BINARY)
+    pixelContourValue = cv2.countNonZero(thresh12)
+    cv2.imshow('Output thresh', thresh12)
+    cv2.waitKey(0)
 
+    return pixelCountValue-pixelContourValue
+
+img = cv2.imread(r"C:\Users\Ruslan\Desktop\test2.png")
+# # img = cv2.medianBlur(img,5)
+print(detectFluores(img))
 
 def detectWells(img, minimumradius, maximumradius, debugbool):
     # minimumradius default : 130
