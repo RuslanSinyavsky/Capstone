@@ -2,7 +2,6 @@ from cv2 import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 from Circles import croppedImages
-import math
 
 def intensityFluores(image):
 
@@ -36,29 +35,49 @@ def sizeGrowth(image):
     ret, thresh1 = cv2.threshold(gray8UC1, 95, 30, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
     contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    img = cv2.drawContours(image, contours, -1, (255, 255, 255), 2)
+    img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
     gray8UC1_test = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ret1, thresh12 = cv2.threshold(gray8UC1_test, 254, 255, cv2.THRESH_BINARY)
     pixelContourValue = cv2.countNonZero(thresh12)
 
-
-    return pixelCountValue-pixelContourValue
+    return pixelCountValue-pixelContourValue        #pixel value of filament
 
 def detectDroplets(c_img):
 
-    minimumradius = 130
-    maximumradius = 180
-    minimumdistance = 150 #minimum distance between any two cells
+# Otsu's thresholding
+    blur = cv2.GaussianBlur(c_img,(5,5),0)
+    ret,th = cv2.threshold(blur,30,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    contours, hierarchy = cv2.findContours(th.copy(), cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
+    for i in range(0,len(contours)):
+        area = cv2.contourArea(contours[i],False)
+        arch = cv2.arcLength(contours[i],False)
+        roundness = (4* math.pi * area)/math.pow(arch,2)
+        if roundness <0.9 :
+            #we are not sort of round
+            print("not circle detected so removed")
+            contours.remove(i)
+
+    out = np.zeros_like(c_img)
+    print(len(contours))
+    print(len(hierarchy[0][1]))
+    holes = [contours[i] for i in range(len(contours)) if hierarchy[0][i][2] >= 0]
+    del holes[0]
+    print(len(holes))
+    cv2.drawContours(c_img, holes, -1, 255, 1)
+    #img = cv2.drawContours(img, contours, -1, (0,255,0), 3)
+    #cnt = contours[7]
+   # (x,y),radius = cv2.minEnclosingCircle(cnt)
+    #center = (int(x),int(y))
+    #radius = int(radius)
+    #cv2.circle(c_img,center,radius,(0,255,0),2)
+    cv2.imshow('Output', c_img)
+    cv2.waitKey(0)
+   # center = (int(x),int(y))
+    #radius = int(radius)
+    #cv2.circle(c_img,center,radius,(0,255,0),2)
+    return holes
 
     circles = cv2.HoughCircles(c_img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
                                param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
     circles = np.uint16(np.around(circles))
     return circles
-
-def radiusCalc(image):
-    contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    # For testing------------------------------------------#
-    # img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
-    area = cv2.contourArea(contours[0],False)
-    radius = int(math.sqrt(area/3.14))
-    return radius

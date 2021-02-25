@@ -9,7 +9,7 @@ frame.pack()
 enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
-maxcellsize_label = Label(root, text="Max cell size allowed (unit?): ")
+maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
 mindropsize_label = Label(root, text="Min droplet size allowed (um): ")
 
 #Entries
@@ -24,7 +24,7 @@ mindrop_entry = Entry(root, bd=3, width=6)
 tkvar = StringVar(root)
 
 #time unit options
-time_units = {'s', 'min', 'hr'}
+time_units = ['s', 'min', 'hr']
 unit_list = OptionMenu(frame, tkvar, *time_units)
 
 def chooseUnit(*args):
@@ -82,7 +82,7 @@ time_entry.pack()
 time_entry.place(x=160, y=70)
 
 maxcell_entry.pack()
-maxcell_entry.place(x=220, y=100)
+maxcell_entry.place(x=260, y=100)
 
 mindrop_entry.pack()
 mindrop_entry.place(x=220, y=130)

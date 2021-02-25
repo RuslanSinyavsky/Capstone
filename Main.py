@@ -99,7 +99,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         if datetime.now() > end_time:
             print('finished')
             FluorGraph(timeinterval, end_time_unit, unit)
-            # FilGraph(timeinterval,end_time_unit,unit)
+            FilGraph(timeinterval,end_time_unit,unit)
 
 
 def FluorGraph(timeinterval, end_time, unit):
