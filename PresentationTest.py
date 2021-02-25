@@ -18,24 +18,31 @@ Circles.isolateWells(img_F)                #isolate wells in Fl picture
 #Finish
 
 #Cropping out wells
-croppedImage = Circles.croppedImages[7] #THE ARRAY OF ISOLATED WELL's first picture
+croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
 #plt.imshow(croppedImage)
 #plt.show()
 
+#Detect filament
+
+
+
 #Locate droplets
-CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage) #the location of all cells inside the cropped image
+CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image
 print(len(CellsInsideCroppedImage))
 
 #Drolet ruling out criteria
 if len(CellsInsideCroppedImage) > 1:
     #do nothing because well is invalid due to having more than 1 droplet
-    print("There is more than 1 cell inside the well")
+    print("There is more than 1 droplet inside the well")
 
 else:
     if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
         #if area of our individual droplet is less than 15 then remove them from array
         print("Droplet too small, do not analyze")
+    else:
+        #analyze filament
+        FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
 #Finish
 
 #Filament growth level

@@ -92,7 +92,7 @@ def acquireImage():
     #stitched_img2 = dataset.read_image(position=0)
     #globals()['string%s' % x] = 'Hello'
 
-    length=16
+    #length=16
     posrange = int(math.sqrt(length))
     posincrement = posrange
 
