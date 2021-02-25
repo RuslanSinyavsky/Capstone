@@ -81,3 +81,11 @@ def detectDroplets(c_img):
                                param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
     circles = np.uint16(np.around(circles))
     return circles
+
+def radiusCalc(image):
+    contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # For testing------------------------------------------#
+    # img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
+    area = cv2.contourArea(contours[0],False)
+    radius = int(math.sqrt(area/3.14))
+    return radius
