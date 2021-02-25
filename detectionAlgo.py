@@ -2,6 +2,7 @@ from cv2 import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 from Circles import croppedImages
+import math
 
 def intensityFluores(image):
 
@@ -32,7 +33,7 @@ def sizeGrowth(image):
 
     # gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     gray8UC1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    ret, thresh1 = cv2.threshold(gray8UC1, 25, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(gray8UC1, 95, 30, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
     contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     img = cv2.drawContours(image, contours, -1, (255, 255, 255), 2)
@@ -53,3 +54,11 @@ def detectDroplets(c_img):
                                param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
     circles = np.uint16(np.around(circles))
     return circles
+
+def radiusCalc(image):
+    contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # For testing------------------------------------------#
+    # img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
+    area = cv2.contourArea(contours[0],False)
+    radius = int(math.sqrt(area/3.14))
+    return radius
