@@ -4,41 +4,49 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
+fil_test = cv2.imread(r"C:\Users\mperl\Desktop\test2.png")      #just to test filament pixel count
 
-img_fluor = cv2.imread(r"C:\Users\mperl\Desktop\test1.png", 0)
-img_fil = cv2.imread(r"C:\Users\mperl\Desktop\test3.png", 0)
-fil_test = cv2.imread(r"C:\Users\mperl\Desktop\test2.png")
+#Images to use for demo
+img_BF = cv2.imread(r"C:\capstone\test3.tif", 0)       #BF image
+img_F = cv2.imread(r"C:\capstone\test1.png", 0)        #FL image
+#print(detectionAlgo.sizeGrowth(fil_test))
 
-img = cv2.imread(r"C:\capstone\test3.tif", 0)
-img2 = cv2.imread(r"C:\capstone\test1.png", 0)
-print(detectionAlgo.sizeGrowth(fil_test))
+#Locate Wells
+Circles.detectWells(img_BF,80,180,True)    #detect wells in BF picture
+Circles.isolateWells(img_BF)               #isolate wells in BF picture
+Circles.isolateWells(img_F)                #isolate wells in Fl picture
+#Finish
 
-#DETECT AND ISOLATE THE WELLS
-Circles.detectWells(img,80,180,True)
-Circles.isolateWells(img)
-Circles.isolateWells(img2)
-##Finish detect and isolate wells
+#Cropping out wells
+croppedImage = Circles.croppedImages[1] #THE ARRAY OF ISOLATED WELL's first picture
 
-
-
-
-croppedimage = Circles.croppedImages[1] #THE ARRAY OF ISOLATED WELL's first picture
-
-plt.imshow(croppedimage)
+plt.imshow(croppedImage)
 plt.show()
-CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedimage) #the location of all cells inside the cropped image
+
+#Locate droplets
+CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage) #the location of all cells inside the cropped image
 print(CellsInsideCroppedImage)
+
+#Drolet ruling out criteria
 if len(CellsInsideCroppedImage) > 1:
-    ## do nothing because well is invalid due to having more than 1 droplet
-    print("we have more than 1 cell inside our image")
+    #do nothing because well is invalid due to having more than 1 droplet
+    print("There is more than 1 cell inside the well")
+
+else:
+    if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
+        #if area of our individual droplet is less than 15 then remove them from array
+        print("Droplet too small, do not analyze")
+#Finish
+
+#Filament growth level
+filament_level = detectionAlgo.intensityFluores(croppedImage)
+print("Filament growth level (pixels): ", filament_level)
+#Fluorescence growth level
+fluorescence_level = detectionAlgo.sizeGrowth(croppedImage)
+print("Fluorescence growth level (pixels): ", fluorescence_level)
 
 
+#Filament size max?
 
-
-#Circles.detectWells(img,30,180,True)
-#Circles.isolateWells(img)
 
 cv2.waitKey(0)
-
-
-

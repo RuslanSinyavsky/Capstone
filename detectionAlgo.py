@@ -32,7 +32,7 @@ def intensityFluores(image):
 def sizeGrowth(image):
 
     gray8UC1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    ret, thresh1 = cv2.threshold(gray8UC1, 25, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(gray8UC1, 95, 30, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
     contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
@@ -56,8 +56,6 @@ def detectDroplets(c_img):
             #we are not sort of round
             print("not circle detected so removed")
             contours.remove(i)
-
-
 
     out = np.zeros_like(c_img)
     print(len(contours))
