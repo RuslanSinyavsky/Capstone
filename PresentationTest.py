@@ -18,14 +18,14 @@ Circles.isolateWells(img_F)                #isolate wells in Fl picture
 #Finish
 
 #Cropping out wells
-croppedImage = Circles.croppedImages[1] #THE ARRAY OF ISOLATED WELL's first picture
+croppedImage = Circles.croppedImages[7] #THE ARRAY OF ISOLATED WELL's first picture
 
-plt.imshow(croppedImage)
-plt.show()
+#plt.imshow(croppedImage)
+#plt.show()
 
 #Locate droplets
 CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage) #the location of all cells inside the cropped image
-print(CellsInsideCroppedImage)
+print(len(CellsInsideCroppedImage))
 
 #Drolet ruling out criteria
 if len(CellsInsideCroppedImage) > 1:
@@ -39,11 +39,11 @@ else:
 #Finish
 
 #Filament growth level
-filament_level = detectionAlgo.intensityFluores(croppedImage)
-print("Filament growth level (pixels): ", filament_level)
+#filament_level = detectionAlgo.intensityFluores(croppedImage)
+#print("Filament growth level (pixels): ", filament_level)
 #Fluorescence growth level
-fluorescence_level = detectionAlgo.sizeGrowth(croppedImage)
-print("Fluorescence growth level (pixels): ", fluorescence_level)
+#fluorescence_level = detectionAlgo.sizeGrowth(croppedImage)
+#print("Fluorescence growth level (pixels): ", fluorescence_level)
 
 
 #Filament size max?

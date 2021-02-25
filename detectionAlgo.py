@@ -47,24 +47,41 @@ def detectDroplets(c_img):
 
 # Otsu's thresholding
     blur = cv2.GaussianBlur(c_img,(5,5),0)
-    ret,th = cv2.threshold(blur,30,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    ret,th = cv2.threshold(blur,15,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(th.copy(), cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
+
+    #print(contours[0])
+    #cv2.drawContours(c_img, contours[0], -1, 255, 1)
+    #cv2.imshow('Output', c_img)
+    #cv2.waitKey(0)
+    contours2=[]
     for i in range(0,len(contours)):
+
         area = cv2.contourArea(contours[i],False)
         arch = cv2.arcLength(contours[i],False)
         roundness = (4* math.pi * area)/math.pow(arch,2)
-        if roundness <0.9 :
+        if roundness <0.5 :
             #we are not sort of round
             print("not circle detected so removed")
-            contours.remove(i)
+            print("contours : ",len(contours))
+            #contours.remove(i)
+        else:
+            contours2.append(contours[i])
 
+    #cv2.drawContours(c_img, contours2, -1, 255, 1)
+    #cv2.imshow('Output', c_img)
+    #cv2.waitKey(0)
     out = np.zeros_like(c_img)
-    print(len(contours))
-    print(len(hierarchy[0][1]))
-    holes = [contours[i] for i in range(len(contours)) if hierarchy[0][i][2] >= 0]
-    del holes[0]
-    print(len(holes))
-    cv2.drawContours(c_img, holes, -1, 255, 1)
+    #print(len(contours))
+   # print(len(hierarchy[0][1]))
+    holes = [contours2[i] for i in range(len(contours2)) if (hierarchy[0][i][2] >= 0 )]
+    if len(holes)>0:
+        del holes[0]
+
+    holes2 = [contours2[i] for i in range(len(contours2)) if hierarchy[0][i][0] >= 0]
+    holes3= holes+holes2
+    print("holes length =",len(holes3))
+    cv2.drawContours(c_img, holes3, -1, 255, 1)
     #img = cv2.drawContours(img, contours, -1, (0,255,0), 3)
     #cnt = contours[7]
    # (x,y),radius = cv2.minEnclosingCircle(cnt)
@@ -78,10 +95,6 @@ def detectDroplets(c_img):
     #cv2.circle(c_img,center,radius,(0,255,0),2)
     return holes
 
-    circles = cv2.HoughCircles(c_img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
-                               param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
-    circles = np.uint16(np.around(circles))
-    return circles
 
 def radiusCalc(image):
     contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
