@@ -35,9 +35,9 @@ def detectFluores(image):
 
     return pixelCountValue-pixelContourValue
 
-img = cv2.imread(r"C:\Users\Ruslan\Desktop\test2.png")
+#img = cv2.imread(r"C:\Users\Ruslan\Desktop\test2.png")
 # # # img = cv2.medianBlur(img,5)
-print(detectFluores(img))
+#print(detectFluores(img))
 
 def detectWells(img, minimumradius, maximumradius, debugbool):
     # minimumradius default : 130
