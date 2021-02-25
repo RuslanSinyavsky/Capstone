@@ -24,7 +24,7 @@ mindrop_entry = Entry(root, bd=3, width=6)
 tkvar = StringVar(root)
 
 #time unit options
-time_units = {'s', 'min', 'hr'}
+time_units = ['s', 'min', 'hr']
 unit_list = OptionMenu(frame, tkvar, *time_units)
 
 def chooseUnit(*args):

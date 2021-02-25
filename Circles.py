@@ -98,33 +98,33 @@ def isolateWells(img):
         croppedImage_raw = img[uppery:lowery, upperx:lowerx].copy()
         gray8UC1 = cv2.cvtColor(croppedImage_numbered, cv2.COLOR_BGR2GRAY)
 
-        ret, thresh1 = cv2.threshold(gray8UC1, 30, 255, cv2.THRESH_BINARY)
-        contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        img2 = cv2.drawContours(croppedImage_raw, contours, -1, (0, 255, 0), 3)  # outer edge
+      #  ret, thresh1 = cv2.threshold(gray8UC1, 30, 255, cv2.THRESH_BINARY)
+       # contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+       # img2 = cv2.drawContours(croppedImage_raw, contours, -1, (0, 255, 0), 0)  # outer edge
 
-        contours, hierarchy = cv2.findContours(gray8UC1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        img3 = cv2.drawContours(croppedImage_numbered, contours, -1, (0, 255, 0), 3)
+       # contours, hierarchy = cv2.findContours(gray8UC1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        #img3 = cv2.drawContours(croppedImage_numbered, contours, -1, (0, 255, 0), 3)
 
-        gray = cv2.cvtColor(img3, cv2.COLOR_BGR2GRAY)
-        ret, thresh2 = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+       # gray = cv2.cvtColor(img3, cv2.COLOR_BGR2GRAY)
+       # ret, thresh2 = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-        cnts = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        #cnts = cv2.findContours(thresh2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        #cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
-        cv2.drawContours(thresh2, cnts, 4, (255, 255, 255), cv2.FILLED)  # our MASK
+#        cv2.drawContours(thresh2, cnts, 4, (255, 255, 255), cv2.FILLED)  # our MASK
 
         # Generate mask
 
         mask = np.zeros_like(img)
-        mask = cv2.circle(mask, (i[0], i[1]), i[2], (255, 255, 255), -1)
+        mask = cv2.circle(mask, (i[0], i[1]), i[2]-10, (255, 255, 255), -1)
         croppedmask = mask[uppery:lowery, upperx:lowerx].copy()
         maskedImage = cv2.bitwise_and(croppedImage_raw, croppedmask)  ### THE FINAL CROPPED IMAGE WITH BLACK BACKGROUND
         croppedImages.append(maskedImage)
         pos = pos + 1
 
         ##DEBUG PRINTOUT
-        cv2.imshow("Debug isolatewells",maskedImage)
-        cv2.waitKey(0)
+        #cv2.imshow("Debug isolatewells",maskedImage)
+        #cv2.waitKey(0)
         ##DEBUG END
 
 def addWells(index, y_pos, x_pos, radius, cropped_img):
