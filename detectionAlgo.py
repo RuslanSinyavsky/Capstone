@@ -93,7 +93,7 @@ def detectDroplets(c_img):
    # center = (int(x),int(y))
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
-    return holes
+    return holes3
 
 
 def radiusCalc(image):
