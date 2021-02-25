@@ -30,12 +30,18 @@ def intensityFluores(image):
 
 def sizeGrowth(image):
 
-    gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-    gray8UC1 = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-    ret, thresh1 = cv2.threshold(gray8UC1, 55, 255, cv2.THRESH_BINARY)
+    # gray = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    gray8UC1 = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    ret, thresh1 = cv2.threshold(gray8UC1, 25, 255, cv2.THRESH_BINARY)
     pixelCountValue = cv2.countNonZero(thresh1)
+    contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    img = cv2.drawContours(image, contours, -1, (255, 255, 255), 2)
+    gray8UC1_test = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret1, thresh12 = cv2.threshold(gray8UC1_test, 254, 255, cv2.THRESH_BINARY)
+    pixelContourValue = cv2.countNonZero(thresh12)
 
-    return pixelCountValue
+
+    return pixelCountValue-pixelContourValue
 
 def detectDroplets(c_img):
 
