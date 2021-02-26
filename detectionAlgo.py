@@ -60,11 +60,12 @@ def detectDroplets(c_img):
         area = cv2.contourArea(contours[i],False)
         arch = cv2.arcLength(contours[i],False)
         roundness = (4* math.pi * area)/math.pow(arch,2)
-        print("Roundness : ",roundness)
+        #print("Roundness : ",roundness)
         if roundness <0.5 :
             #we are not sort of round
-            print("not circle detected so removed")
-            print("contours : ",len(contours))
+            print()
+           # print("not circle detected so removed")
+           # print("contours : ",len(contours))
             #contours.remove(i)
         else:
             contours2.append(contours[i])
@@ -81,7 +82,7 @@ def detectDroplets(c_img):
 
     holes2 = [contours2[i] for i in range(len(contours2)) if hierarchy[0][i][0] >= 0]
     holes3= holes+holes2
-    print("holes length =",len(holes3))
+   # print("holes length =",len(holes3))
     cv2.drawContours(c_img, holes3, -1, 255, 1)
     #img = cv2.drawContours(img, contours, -1, (0,255,0), 3)
     #cnt = contours[7]
@@ -141,7 +142,7 @@ def detectFilament(c_img):
         center = (int(x),int(y))
         radius = int(radius)
         cv2.circle(th2,center,radius,255,2)
-        print("we have: ",len(contours))
+     #   print("we have: ",len(contours))
         cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
         cv2.imshow('Output', c_img_masked)
         cv2.waitKey(0)
