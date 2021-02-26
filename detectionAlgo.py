@@ -111,7 +111,7 @@ def detectFilament(c_img):
     c_img_masked_not = cv2.bitwise_not(c_img_masked.copy(),c_img_masked.copy())
 
     cv2.imshow('Output', c_img)
-    cv2.waitKey(0)
+    #cv2.waitKey(0)
     #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
     c_img_masked_dilate = cv2.dilate(c_img_masked_not, np.ones((11, 11)),2)
     c_img_masked_dilate_not = cv2.bitwise_not(c_img_masked_dilate.copy(),c_img_masked_dilate.copy())
@@ -131,8 +131,8 @@ def detectFilament(c_img):
         if area < 10:
            cv2.fillPoly(th2, pts=[c], color=0)
            continue
-    #th2 = cv2.morphologyEx(th2, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))); #this one actually closes the filaments individually
-    th2 = cv2.morphologyEx(th2, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))); ##close the filaments to get an area
+    th2 = cv2.morphologyEx(th2, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))); #this one actually closes the filaments individually
+    # th2 = cv2.morphologyEx(th2, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))); ##close the filaments to get an area
     contours_isolated, hierarchy_isolated = cv2.findContours(th2, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     cnt = max(contours_isolated, key=cv2.contourArea)
     (x,y),radius = cv2.minEnclosingCircle(cnt)
@@ -141,16 +141,16 @@ def detectFilament(c_img):
     cv2.circle(th2,center,radius,255,2)
     print("we have: ",len(contours))
     cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
-    cv2.imshow('Output', c_img_masked)
+    cv2.imshow('Final', c_img_masked)
     cv2.waitKey(0)
 
     return contours_isolated #returns the contour of the actual filament
 
 
-def radiusCalc(image):
-    contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    # For testing------------------------------------------#
-    # img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
-    area = cv2.contourArea(contours[0],False)
-    radius = int(math.sqrt(area/3.14))
+def maxThreshCalc(img):
+
+    if len(img) > 0:
+        c = max(img, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+
     return radius
