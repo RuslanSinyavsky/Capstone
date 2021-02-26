@@ -28,6 +28,7 @@ croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first pic
 #Detect filament
 
 FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
+print("Filament size : ",detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage))
 
 #Locate droplets
 CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image

@@ -150,10 +150,10 @@ def detectFilament(c_img):
     return contours_isolated #returns the contour of the actual filament
 
 
-def radiusCalc(image):
-    contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    # For testing------------------------------------------#
-    # img = cv2.drawContours(image, contours, -1, (255, 255, 255), 1)
-    area = cv2.contourArea(contours[0],False)
-    radius = int(math.sqrt(area/3.14))
-    return radius
+def maxThreshCalc(img):
+
+    if len(img) > 0:
+        c = max(img, key=cv2.contourArea)
+        ((x, y), radius) = cv2.minEnclosingCircle(c)
+
+        return radius
