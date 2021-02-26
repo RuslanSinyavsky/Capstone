@@ -37,7 +37,7 @@ def concat_tile(im_list_2d):
 
 
 
-def acquireImage():
+def acquireImage(channelGroup,channelName):
 
     x_array = []
     y_array = []
@@ -66,7 +66,7 @@ def acquireImage():
         z=np.hstack([z_array[:, None]])
         #Generate the events for a single z-stack
         xyz = np.hstack([x_array[:, None], y_array[:, None], z_array[:, None]])
-        events = multi_d_acquisition_events(xyz_positions=xyz)
+        events = multi_d_acquisition_events(xyz_positions=xyz, channel_group= channelGroup , channels= [channelName] )
         acq.acquire(events)
         #acquire a 2 x 1 grid
         #acq.acquire({'row': 0, 'col': 0})
@@ -115,7 +115,7 @@ def acquireImage():
                 if index<length-1:
                     print(index)
 
-                    img = dataset.read_image(position=index)
+                    img = dataset.read_image(position=index , channel_name = channelName)
                     imgtable1.append(img)
                     index=index+1
 
@@ -129,7 +129,7 @@ def acquireImage():
                 if index<=length:
                     print(index)
                     index=index+1
-                    img = dataset.read_image(position=x_pos)
+                    img = dataset.read_image(position=x_pos, channel_name = channelName)
                     imgtable2.append(img)
             imgtable2=np.flipud(imgtable2)
             newimg=cv2.vconcat(imgtable2)

@@ -1,7 +1,7 @@
 import math, time
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-# import PycroManagerCoreControl as pycrocontrol
+import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 
@@ -47,7 +47,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
     # ------
     # do our first image acquisition here
-    #   image = pycrocontrol.acquireImage()
+    image = pycrocontrol.acquireImage()
     #   detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
     #   detection.isolateWells(image) #creates array of isolated well images
 

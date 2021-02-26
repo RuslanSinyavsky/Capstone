@@ -20,7 +20,7 @@ Circles.isolateWells(img_BF)               #isolate wells in BF picture
 #---------------------------------------BRIGHTFIELD--------------------------------------------------------------------
 #=======================================================================================================================
 #Cropping out wells
-croppedImage = Circles.croppedImages[1] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
+croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
 #plt.imshow(croppedImage)
 #plt.show()
@@ -54,7 +54,7 @@ else:
             #analyze filament
             #cnt = max(contours_isolated, key=cv2.contourArea)
             (x,y),radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
-            print("radius = : ",radius)
+            print("radius of this droplet is = : ",radius)
             print()
 
 
