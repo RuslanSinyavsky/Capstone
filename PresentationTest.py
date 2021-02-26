@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 
 #Images to use for demo
 img_BF = cv2.imread(r"C:\capstone\test3.tif", 0)       #BF image
-img_F = cv2.imread(r"C:\capstone\test1.png", 0)        #FL image
+img_F = cv2.imread(r"C:\capstone\test1.png",0)        #FL image
 
 #Locate Wells & isolate Brightfield
 Circles.detectWells(img_BF,80,180,True)    #detect wells in BF picture
@@ -69,10 +69,10 @@ Circles.isolateWells(img_F)                #isolate wells in Fl picture
 
 
 #Cropping out wells
-croppedImage = Circles.croppedImages[1] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
+croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
-#plt.imshow(croppedImage)
-#plt.show()
+plt.imshow(croppedImage)
+plt.show()
 
 
 #Locate droplets
@@ -92,7 +92,8 @@ else:
         else:
             #Record our data
 
-
+            cellFluorescence = detectionAlgo.intensityFluores(croppedImage)
+            print("Cell fluorescence : ",cellFluorescence)
             #end record
 
 

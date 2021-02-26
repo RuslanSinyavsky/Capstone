@@ -70,6 +70,7 @@ def isolateWells(img):
     circles = vCircles
     img = cv2.medianBlur(img, 5)
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
     pos=0
 
     global croppedImages
