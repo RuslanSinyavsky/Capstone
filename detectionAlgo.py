@@ -91,7 +91,7 @@ def detectDroplets(c_img):
     #cv2.circle(c_img,center,radius,(0,255,0),2)
     #cv2.imshow('Output', c_img)
     #cv2.waitKey(0)
-    #center = (int(x),int(y))
+   # center = (int(x),int(y))
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
     return holes3
@@ -146,7 +146,7 @@ def detectFilament(c_img):
         cv2.imshow('Output', c_img_masked)
         cv2.waitKey(0)
 
-        return contours_isolated #returns the contour of the actual filament
+    return contours_isolated #returns the contour of the actual filament
 
 
 def radiusCalc(image):
