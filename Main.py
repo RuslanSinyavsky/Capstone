@@ -47,7 +47,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
     # ------
     # do our first image acquisition here
-    image = pycrocontrol.acquireImage()
+    image = pycrocontrol.acquireImage("ESP-XLED","BF") #acquire brightfield on the ESP-XLED channel group
     #   detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
     #   detection.isolateWells(image) #creates array of isolated well images
 
