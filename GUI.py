@@ -11,6 +11,7 @@ nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
 maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
 mindropsize_label = Label(root, text="Min droplet size allowed (um): ")
+#unit_alert_label = Label(root, text="Please select a time unit to continue", fg='red')
 
 #Entries
 nb_pics_entry = Entry(root, bd=3, width=6)
@@ -29,33 +30,34 @@ unit_list = OptionMenu(frame, tkvar, *time_units)
 
 def chooseUnit(*args):
     print("Unit chosen:", tkvar.get())
-
 tkvar.trace('w', chooseUnit)
 
 #Buttons
 def Setting():
-
     def imagingStart():
         start_btn.config(state=DISABLED)
-        #main.IncubationTime(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get())
         main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
 
-    root2 = Tk()
-    frame2 = Frame(root2, height=270, width=410)
-    frame2.pack()
-    set_btn.config(state=DISABLED)
-    light_warning_label = Label(root2, text="Please ensure that the light in the room is off", fg='blue')
-    lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables", fg='red')
-    start_btn = Button(root2, text="Begin imaging", width=12, command=imagingStart)
+    print(tkvar.get())
+    if not tkvar.get():
+        print("Please select a time unit to continue")
+    else:
+        root2 = Tk()
+        frame2 = Frame(root2, height=270, width=410)
+        frame2.pack()
+        set_btn.config(state=DISABLED)
+        light_warning_label = Label(root2, text="Please ensure that the light in the room is off", fg='blue')
+        lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables", fg='red')
+        start_btn = Button(root2, text="Begin imaging", width=12, command=imagingStart)
 
-    start_btn.pack()
-    start_btn.place(x=160, y=170)
-    light_warning_label.pack()
-    light_warning_label.place(x=20, y=10)
+        start_btn.pack()
+        start_btn.place(x=160, y=170)
+        light_warning_label.pack()
+        light_warning_label.place(x=20, y=10)
+        lamp_warning_label.pack()
+        lamp_warning_label.place(x=20, y=40)
 
-    lamp_warning_label.pack()
-    lamp_warning_label.place(x=20, y=40)
-    root2.mainloop()
+        root2.mainloop()
 
 set_btn = Button(root, text="Set", width=5, command=Setting)
 
@@ -74,6 +76,9 @@ maxcellsize_label.place(x=40, y=100)
 
 mindropsize_label.pack()
 mindropsize_label.place(x=40, y=130)
+
+#unit_alert_label.pack()
+#unit_alert_label.place(x=80, y=250)
 
 nb_pics_entry.pack()
 nb_pics_entry.place(x=160, y=40)

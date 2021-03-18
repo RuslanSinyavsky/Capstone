@@ -1,31 +1,9 @@
 import math, time
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-import PycroManagerCoreControl as pycrocontrol
+#import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
-
-
-# iteration = 0 #nb of times a picture was taken
-# end_time = datetime
-
-# def IncubationTime(nb_pics, time, unit) -> datetime:
-
-# start_time = datetime.datetime.now()
-
-#    if unit == 's':
-#        end_time = start_time + timedelta(seconds=(nb_pics-1) * time)
-#        print("unit received:", unit)
-#    if unit == 'min':
-#        end_time = start_time + timedelta(minutes=(nb_pics-1) * time)
-#        print("unit received:", unit)
-#    if unit == 'hrs':
-#        end_time = start_time + timedelta(hours=(nb_pics-1) * time)
-#        print("unit received:", unit)
-
-#    print("start time:", start_time)
-#    print("total time:", end_time)
-# return end_time
 
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     start_time = datetime.now()
@@ -34,20 +12,20 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     if unit == 's':
         end_time = start_time + timedelta(seconds=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.second - start_time.second
-        print("unit received:", end_time_unit)
+        print("time received:", end_time_unit, unit)
     if unit == 'min':
         end_time = start_time + timedelta(minutes=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.minute - start_time.minute
-        print("unit received:", unit)
+        print("time received:", end_time_unit, unit)
     if unit == 'hrs':
         end_time = start_time + timedelta(hours=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.hour - start_time.hour
-        print("unit received:", unit)
+        print("time received:", end_time_unit, unit)
     timelast = start_time
 
     # ------
     # do our first image acquisition here
-    image = pycrocontrol.acquireImage("ESP-XLED","BF") #acquire brightfield on the ESP-XLED channel group
+    #image = pycrocontrol.acquireImage("ESP-XLED","BF") #acquire brightfield on the ESP-XLED channel group
     #   detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
     #   detection.isolateWells(image) #creates array of isolated well images
 
@@ -57,7 +35,6 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         if len(dropletsinside) > 1:
             # do nothing because well is invalid due to having more than 1 droplet
             time.sleep(0)
-
 
         else:
 
@@ -73,9 +50,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # ------
 
     while datetime.now() < end_time:
-
         # do the rest of our image acquisitions here
-
         if unit == 's':
             if datetime.now().second - timelast.second >= timeinterval:
                 # do stuff
@@ -83,24 +58,20 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 print("in time loop")
                 timelast = datetime.now()
                 time.sleep(1)
-
         if unit == 'min':
             if datetime.now().minute - timelast.minute >= timeinterval:
                 # do stuff
                 timelast = datetime.now()
                 time.sleep(1)
-
         if unit == 'hrs':
             if datetime.now().hour - timelast.hour >= timeinterval:
                 # do stuff
                 timelast = datetime.now()
                 time.sleep(1)
-
         if datetime.now() > end_time:
             print('finished')
-            FluorGraph(timeinterval, end_time_unit, unit)
-            FilGraph(timeinterval,end_time_unit,unit)
-
+            #FluorGraph(timeinterval, end_time_unit, unit)
+            #FilGraph(timeinterval,end_time_unit,unit)
 
 def FluorGraph(timeinterval, end_time, unit):
     # x-axis values
