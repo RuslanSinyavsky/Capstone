@@ -17,7 +17,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         end_time = start_time + timedelta(minutes=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.minute - start_time.minute
         print("time received:", end_time_unit, unit)
-    if unit == 'hrs':
+    if unit == 'hr':
         end_time = start_time + timedelta(hours=(nb_pics - 1) * timeinterval)
         end_time_unit = end_time.hour - start_time.hour
         print("time received:", end_time_unit, unit)

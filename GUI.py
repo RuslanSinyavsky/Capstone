@@ -1,5 +1,6 @@
 from tkinter import *
 import Main as main
+import Main2 as main2
 
 root = Tk()
 frame = Frame(root, height=300, width=380)
@@ -36,9 +37,10 @@ tkvar.trace('w', chooseUnit)
 def Setting():
     def imagingStart():
         start_btn.config(state=DISABLED)
-        main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
+        #main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
+        main2.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
 
-    print(tkvar.get())
+    #print(tkvar.get())
     if not tkvar.get():
         print("Please select a time unit to continue")
     else:
