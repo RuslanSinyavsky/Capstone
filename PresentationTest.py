@@ -72,10 +72,11 @@ Circles.isolateWells(img_F)                #isolate wells in Fl picture
 #Cropping out wells
 croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
-plt.imshow(croppedImage)
-plt.show()
+#plt.imshow(croppedImage)
+#plt.show()
 
-
+FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
+print("Filament size : ",detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage))
 #Locate droplets
 CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image
 print(len(CellsInsideCroppedImage))

@@ -12,7 +12,10 @@ mm = bridge.get_studio()
 pm = mm.positions()
 mmc = mm.core()
 pos_list = pm.get_position_list()
-
+#-------------------------------------------
+directoryPATH = 'E:\KENZA Folder\CapstoneTests'
+nameofSAVEDFILE = 'saving_name'
+#--------------------------------------------
 def merge_imagesVertical(file1, file2):
     """Merge two images into one vertical image
     :return: the merged Image object
@@ -60,7 +63,7 @@ def acquireImage(channelGroup,channelName):
     z_array = np.array(z_array)
 
 
-    with Acquisition(directory='E:\KENZA Folder\CapstoneTests', name='saving_name') as acq:
+    with Acquisition(directory=directoryPATH, name=nameofSAVEDFILE) as acq:
         x=np.hstack([x_array[:, None]])
         y=np.hstack([y_array[:, None]])
         z=np.hstack([z_array[:, None]])
@@ -147,6 +150,8 @@ def acquireImage(channelGroup,channelName):
 
     imgtoshow=cv2.hconcat(stitched_image)
     plt.imshow(imgtoshow)
-    plt.show()
+    return stitched_image
+    #plt.savefig('foo.png')
+    #plt.show()
 
 

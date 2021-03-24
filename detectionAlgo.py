@@ -46,6 +46,7 @@ def sizeGrowth(image):
 def detectDroplets(c_img):
 
 # Otsu's thresholding
+
     blur = cv2.GaussianBlur(c_img,(5,5),0)
     ret,th = cv2.threshold(blur,15,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(th.copy(), cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
@@ -90,8 +91,10 @@ def detectDroplets(c_img):
     #center = (int(x),int(y))
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
-    #cv2.imshow('Output', c_img)
-    #cv2.waitKey(0)
+
+    cv2.imshow('Output', c_img)     #SHOW THE OUTLINE
+    cv2.waitKey(0)
+
    # center = (int(x),int(y))
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
@@ -111,7 +114,7 @@ def detectFilament(c_img):
     c_img_masked = cv2.bitwise_and(c_img, c_img, mask=mask)
     c_img_masked_not = cv2.bitwise_not(c_img_masked.copy(),c_img_masked.copy())
 
-    cv2.imshow('Output', c_img)
+    cv2.imshow('Output', c_img) #SHOW THE RAW PICTURE
     cv2.waitKey(0)
     #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
     c_img_masked_dilate = cv2.dilate(c_img_masked_not, np.ones((11, 11)),2)
