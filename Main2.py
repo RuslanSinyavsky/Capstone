@@ -132,17 +132,17 @@ def FluorGraph(timeinterval, pics, unit):
     for j in range(len(detection.croppedImages)):
         for i in range(detection.croppedImages):
             y.append(dataValuesFlu[i][j])
-            # plotting the points
-            plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-            # naming the x-axis
-            plt.xlabel('Time ' + '(' + unit + ')')
-            # naming the y-axis
-            plt.ylabel('Fluorescence Intensity (pixels)')
-            # graph title
-            plt.title('Fluorescence growth over incubation period')
-            # showing the plot
-            plt.savefig('FluorGraphWell' + i + '.png')
-            print("done plotting")
+    # plotting the points
+    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+    # naming the x-axis
+    plt.xlabel('Time ' + '(' + unit + ')')
+    # naming the y-axis
+    plt.ylabel('Fluorescence Intensity (pixels)')
+    # graph title
+    plt.title('Fluorescence growth over incubation period')
+    # showing the plot
+    plt.savefig('FluorGraphWell' + i + '.png')
+    print("done plotting")
 
 
 def FilGraph(timeinterval, pics, unit):
@@ -153,16 +153,14 @@ def FilGraph(timeinterval, pics, unit):
     for j in range(len(detection.croppedImages)):
         for i in range(detection.croppedImages):
             y.append(dataValuesSize[i][j])
-            print("x axis", x)
-            y = [2, 8]  # test values
-            # plotting the points
-            plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-            # naming the x-axis
-            plt.xlabel('Time ' + '(' + unit + ')')
-            # naming the y-axis
-            plt.ylabel('Filament Intensity (pixels)')
-            # graph title
-            plt.title('Filament growth over incubation period')
-            # showing the plot
-            plt.savefig('FilGraph' + i + '.png')
-            print("done plotting")
+    # plotting the points
+    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+    # naming the x-axis
+    plt.xlabel('Time ' + '(' + unit + ')')
+    # naming the y-axis
+    plt.ylabel('Filament Intensity (pixels)')
+    # graph title
+    plt.title('Filament growth over incubation period')
+    # showing the plot
+    plt.savefig('FilGraph' + i + '.png')
+    print("done plotting")
