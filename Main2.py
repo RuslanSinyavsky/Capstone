@@ -1,11 +1,14 @@
 import math, time
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-#import PycroManagerCoreControl as pycrocontrol
+# import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 
 duration = 0
+dataValuesSize = {}
+dataValuesFlu = {}
+
 
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     if unit == 's':
@@ -18,7 +21,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         duration = timeinterval * 60 * 60
         print("time received (s):", duration)
 
-    for i in range(0, len(detection.croppedImages)):  #might need to loop through circles instead of croppedimages
+    for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
         dropletsinside = algo.detectDroplets(detection.croppedImages[i])
 
         if len(dropletsinside) > 1:
@@ -39,53 +42,66 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     for n in range(nb_pics):
         print("n:", n)
 
-        #image = pycrocontrol.acquireImage("ESP-XLED","BF") #acquire brightfield on the ESP-XLED channel group
+        # image = pycrocontrol.acquireImage("ESP-XLED","BF") #acquire brightfield on the ESP-XLED channel group
 
-        #detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
+        # detection.detectWells(image,min_size,max_size,True) ## might need to be changed a bit
 
-        #detection.isolateWells(image) #creates array of isolated well images
+        # detection.isolateWells(image) #creates array of isolated well images
 
-        #rest...
+        # rest...
+
+        for i in range(len(detection.croppedImages)):
+            dataValuesFlu[n] = {i: algo.detectFluores(detection.croppedImages[i])}
+            dataValuesSize[n] = {i: algo.maxThreshCalc(detection.croppedImages[i])}
 
         time.sleep(duration)
-        end_time=datetime.now()
+        end_time = datetime.now()
     print('loop finished')
-    print('time elapsed:', end_time-start_time)
-    #FluorGraph(timeinterval, nb_pics, unit)
-    #FilGraph(timeinterval, nb_pics,unit)
+    print('time elapsed:', end_time - start_time)
+    # FluorGraph(timeinterval, nb_pics, unit)
+    # FilGraph(timeinterval, nb_pics,unit)
+
 
 def FluorGraph(timeinterval, pics, unit):
     x = []
+    y = []
     for i in range(pics):
-        x.append(timeinterval + (timeinterval*i))
+        x.append(timeinterval + (timeinterval * i))
     print("x axis", x)
-    y = [1, 4]  #test values
-    # plotting the points
-    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-    # naming the x-axis
-    plt.xlabel('Time ' + '(' + unit + ')')
-    # naming the y-axis
-    plt.ylabel('Fluorescence Intensity (pixels)')
-    # graph title
-    plt.title('Fluorescence growth over incubation period')
-    # showing the plot
-    plt.show()
-    print("done plotting")
+    for j in range(len(detection.croppedImages)):
+        for i in range(detection.croppedImages):
+            y.append(dataValuesFlu[i][j])
+            # plotting the points
+            plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+            # naming the x-axis
+            plt.xlabel('Time ' + '(' + unit + ')')
+            # naming the y-axis
+            plt.ylabel('Fluorescence Intensity (pixels)')
+            # graph title
+            plt.title('Fluorescence growth over incubation period')
+            # showing the plot
+            plt.savefig('FluorGraphWell' + i + '.png')
+            print("done plotting")
+
 
 def FilGraph(timeinterval, pics, unit):
     x = []
+    y = []
     for i in range(pics):
-        x.append(timeinterval + (timeinterval*i))
-    print("x axis", x)
-    y = [2, 8]  #test values
-    # plotting the points
-    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-    # naming the x-axis
-    plt.xlabel('Time ' + '(' + unit + ')')
-    # naming the y-axis
-    plt.ylabel('Filament Intensity (pixels)')
-    # graph title
-    plt.title('Filament growth over incubation period')
-    # showing the plot
-    plt.show()
-    print("done plotting")
+        x.append(timeinterval + (timeinterval * i))
+    for j in range(len(detection.croppedImages)):
+        for i in range(detection.croppedImages):
+            y.append(dataValuesSize[i][j])
+            print("x axis", x)
+            y = [2, 8]  # test values
+            # plotting the points
+            plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+            # naming the x-axis
+            plt.xlabel('Time ' + '(' + unit + ')')
+            # naming the y-axis
+            plt.ylabel('Filament Intensity (pixels)')
+            # graph title
+            plt.title('Filament growth over incubation period')
+            # showing the plot
+            plt.savefig('FilGraph' + i + '.png')
+            print("done plotting")
