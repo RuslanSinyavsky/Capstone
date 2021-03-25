@@ -37,10 +37,19 @@ def merge_imagesHorizontal(file1, file2):
 def concat_tile(im_list_2d):
     return cv2.vconcat([cv2.hconcat(im_list_h) for im_list_h in im_list_2d])
 
+def hook_bf(event):
+        time.sleep(1)
+        return event
 
+def hook_fn(event, bridge, event_queue):
+        event_queue.put(None)
+        return event
 
+def hook_fl(event):
+        time.sleep(0)
+        return event
 
-def acquireImage(channelGroup,channelName):
+def acquireImage(channelGroup,channelName, hook):
 
     x_array = []
     y_array = []
@@ -63,7 +72,7 @@ def acquireImage(channelGroup,channelName):
     z_array = np.array(z_array)
 
 
-    with Acquisition(directory=directoryPATH, name=nameofSAVEDFILE) as acq:
+    with Acquisition(directory=directoryPATH, name=nameofSAVEDFILE , pre_hardware_hook_fn=hook, post_camera_hook_fn=hook_fn) as acq:
         x=np.hstack([x_array[:, None]])
         y=np.hstack([y_array[:, None]])
         z=np.hstack([z_array[:, None]])
@@ -88,8 +97,8 @@ def acquireImage(channelGroup,channelName):
 
 
 
-
-
+    # 
+    # Turn this into a stitching function with argument the channel
 
     #stitched_img = dataset.read_image(position=0)
     #stitched_img2 = dataset.read_image(position=0)
@@ -149,8 +158,9 @@ def acquireImage(channelGroup,channelName):
             print("FinishedCombo")
 
     imgtoshow=cv2.hconcat(stitched_image)
-    plt.imshow(imgtoshow)
-    return stitched_image
+    #plt.imshow(imgtoshow)
+    #return stitched_image
+    return imgtoshow
     #plt.savefig('foo.png')
     #plt.show()
 

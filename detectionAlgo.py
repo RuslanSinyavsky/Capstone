@@ -45,7 +45,7 @@ def sizeGrowth(image):
 
 def detectDroplets(c_img):
 
-# Otsu's thresholding
+    # Otsu's thresholding
 
     blur = cv2.GaussianBlur(c_img,(5,5),0)
     ret,th = cv2.threshold(blur,15,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
