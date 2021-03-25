@@ -69,7 +69,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # BRIGHT FIELD
             # ----
             detection.croppedImages.clear()  #clear the cropped images to allow for the next
-            image1 = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
+            image = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(BrightfieldStitchedPath, image1)
             '''
@@ -78,7 +78,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # FLUORESCENT
             # ----
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            image2 = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", pycrocontrol.hook_fl)  #acquire FL on the ESP-XLED channel group
+            image = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", pycrocontrol.hook_fl)  #acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image2)
             '''
@@ -87,7 +87,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # BOTH
             # ----
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            image2 = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", "BF", pycrocontrol.hook_fl)  #acquire BF and FL on the ESP-XLED channel group
+            image = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", "BF", pycrocontrol.hook_fl)  #acquire BF and FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
@@ -98,48 +98,9 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
                 detection.detectWells(image1, min_size, max_size, True)  ## might need to be changed a bit
             '''
-            def BFAnalysis(image):
-                detection.isolateWells(image)  #creates array of isolated well images (image with black border)
-                for i in range(0, len(detection.croppedImages)):  #might need to loop through circles instead of croppedimages
-                    dropletsinside = algo.detectDroplets(detection.croppedImages[i])
-                    if len(dropletsinside) > 1:
-                        # do nothing because well is invalid due to having more than 1 droplet
-                        time.sleep(0)
-                    else:
-                        if (cv2.contourArea(dropletsinside[0]) < min_size):
-                            #if area of our individual droplet is less than min_size then remove them from array
-                            print("Droplet too small, do not analyze")
-                        else:
-                            #detect filaments size in BF
-                            FilamentsInsideCroppedImage = algo.detectFilament(detection.croppedImages[i].copy())
-                            print("Filament size: ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
-                            #RECORD DATA START
-
-                            #RECORD DATA END
-                            (x, y), radius = cv2.minEnclosingCircle((dropletsinside[0]))
-                            print("radius of this droplet is = : ", radius)
-                            # ^^^^ use this to detect abortion criteria ^^^^
-            '''
-            detection.isolateWells(image2)  # creates array of isolated well images (image with black border)
-            for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
-                dropletsinside = algo.detectDroplets(detection.croppedImages[i])
-                if len(dropletsinside) > 1:
-                    # do nothing because well is invalid due to having more than 1 droplet
-                    time.sleep(0)
-                else:
-                    # detects fluorescence is FL picture
-                    # Droplet ruling out criteria
-                    if (cv2.contourArea(dropletsinside[0]) < min_size):
-                        # if area of our individual droplet is less than min_size then remove them from array
-                        print("Droplet too small, do not analyze")
-                    else:
-                        # Record our data
-                        cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
-                        print("Cell fluorescence: ", cellFluorescence)
-                        # RECORD DATA START
-
-                        # RECORD DATA END
-
+            BFAnalysis(image, min_size)
+            FLAnalysis(image, min_size)
+            '''           
             for i in range(len(detection.croppedImages)):
                 dataValuesFlu[n] = {i: algo.detectFluores(detection.croppedImages[i])}
                 dataValuesSize[n] = {i: algo.maxThreshCalc(detection.croppedImages[i])}
@@ -155,6 +116,49 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     if GraphBool:
         FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics,unit)
+
+def BFAnalysis(image, min_size):
+    detection.isolateWells(image)  #creates array of isolated well images (image with black border)
+    for i in range(0, len(detection.croppedImages)):  #might need to loop through circles instead of croppedimages
+        dropletsinside = algo.detectDroplets(detection.croppedImages[i])
+        if len(dropletsinside) > 1:
+            # do nothing because well is invalid due to having more than 1 droplet
+            time.sleep(0)
+        else:
+            if (cv2.contourArea(dropletsinside[0]) < min_size):
+                #if area of our individual droplet is less than min_size then remove them from array
+                print("Droplet too small, do not analyze")
+            else:
+                #detect filaments size in BF
+                FilamentsInsideCroppedImage = algo.detectFilament(detection.croppedImages[i].copy())
+                print("Filament size: ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
+                #RECORD DATA START
+
+                #RECORD DATA END
+                (x, y), radius = cv2.minEnclosingCircle((dropletsinside[0]))
+                print("radius of this droplet is = : ", radius)
+                # ^^^^ use this to detect abortion criteria ^^^^
+
+def FLAnalysis(image, min_size):
+    detection.isolateWells(image)  # creates array of isolated well images (image with black border)
+    for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
+        dropletsinside = algo.detectDroplets(detection.croppedImages[i])
+        if len(dropletsinside) > 1:
+            # do nothing because well is invalid due to having more than 1 droplet
+            time.sleep(0)
+        else:
+            # detects fluorescence is FL picture
+            # Droplet ruling out criteria
+            if (cv2.contourArea(dropletsinside[0]) < min_size):
+                # if area of our individual droplet is less than min_size then remove them from array
+                print("Droplet too small, do not analyze")
+            else:
+                # Record our data
+                cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
+                print("Cell fluorescence: ", cellFluorescence)
+                # RECORD DATA START
+
+                # RECORD DATA END
 
 def onTrigger(udp):
         print('Trigger received. Stopping incubation, starting sorting process.')
