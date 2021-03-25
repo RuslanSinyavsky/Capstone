@@ -2,6 +2,7 @@ from tkinter import *
 import Main as main
 import Main2 as main2
 
+
 root = Tk()
 frame = Frame(root, height=300, width=380)
 frame.pack()
@@ -11,8 +12,8 @@ enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
 maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
-mindropsize_label = Label(root, text="Min droplet size allowed (um): ")
-#unit_alert_label = Label(root, text="Please select a time unit to continue", fg='red')
+mindropsize_label = Label(root, text="Min droplet size allowed (um^2): ")
+error_label = Label(root, text="", fg='red')
 
 #Entries
 nb_pics_entry = Entry(root, bd=3, width=6)
@@ -31,6 +32,7 @@ unit_list = OptionMenu(frame, tkvar, *time_units)
 
 def chooseUnit(*args):
     print("Unit chosen:", tkvar.get())
+    error_label.config(text="")
 tkvar.trace('w', chooseUnit)
 
 #Buttons
@@ -40,9 +42,9 @@ def Setting():
         #main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
         main2.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
 
-    #print(tkvar.get())
     if not tkvar.get():
-        print("Please select a time unit to continue")
+        #print("Please select a time unit to continue")
+        error_label.config(text="Please select a time unit to continue")
     else:
         root2 = Tk()
         frame2 = Frame(root2, height=270, width=410)
@@ -63,6 +65,9 @@ def Setting():
 
 set_btn = Button(root, text="Set", width=5, command=Setting)
 
+def statusUpdate(msg):
+    print("")
+
 #Packing
 enter_param_label.pack()
 enter_param_label.place(x=100, y=10)
@@ -79,8 +84,8 @@ maxcellsize_label.place(x=40, y=100)
 mindropsize_label.pack()
 mindropsize_label.place(x=40, y=130)
 
-#unit_alert_label.pack()
-#unit_alert_label.place(x=80, y=250)
+error_label.pack()
+error_label.place(x=80, y=170)
 
 nb_pics_entry.pack()
 nb_pics_entry.place(x=160, y=40)
