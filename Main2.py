@@ -105,8 +105,8 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FLAnalysis(image, min_size)
             '''           
             for i in range(len(detection.croppedImages)):
-                dataValuesFlu[n] = {i: algo.detectFluores(detection.croppedImages[i])}
-                dataValuesSize[n] = {i: algo.maxThreshCalc(detection.croppedImages[i])}
+                dataValuesFlu.setdefault(n, {})[i] = algo.detectFluores(detection.croppedImages[i])
+                dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
             '''
         #HARDWARE TRIGGER
         if TrigBool:
@@ -114,10 +114,11 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         else:
             time.sleep(duration)
 
-    for j in range(len(detection.croppedImages)):
+    for n in range(len(detection.croppedImages)):
         for i in range(nb_pics):
-            dataValuesFluT[j][i] = dataValuesFlu[i][j]
-            dataValuesSizeT[j][i] = dataValuesSize[i][j]
+            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
+            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
+
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
