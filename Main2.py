@@ -12,6 +12,9 @@ import cv2
 duration = 0
 dataValuesSize = {}
 dataValuesFlu = {}
+dataValuesFluT = {}
+dataValuesSizeT = {}
+
 stitchedSavingFolder = 'E:\KENZA Folder\CapstoneTests'
 '''
 if UDP_Send in sys.modules:
@@ -110,6 +113,11 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             onTrigger(udpSend)
         else:
             time.sleep(duration)
+
+    for j in range(len(detection.croppedImages)):
+        for i in range(nb_pics):
+            dataValuesFluT[j][i] = dataValuesFlu[i][j]
+            dataValuesSizeT[j][i] = dataValuesSize[i][j]
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
