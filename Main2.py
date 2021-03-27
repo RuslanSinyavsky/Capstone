@@ -12,6 +12,9 @@ import cv2
 duration = 0
 dataValuesSize = {}
 dataValuesFlu = {}
+dataValuesFluT = {}
+dataValuesSizeT = {}
+
 stitchedSavingFolder = 'E:\KENZA Folder\CapstoneTests'
 '''
 if UDP_Send in sys.modules:
@@ -107,14 +110,20 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             #FLAnalysis(image, min_size)
             '''           
             for i in range(len(detection.croppedImages)):
-                dataValuesFlu[n] = {i: algo.detectFluores(detection.croppedImages[i])}
-                dataValuesSize[n] = {i: algo.maxThreshCalc(detection.croppedImages[i])}
+                dataValuesFlu.setdefault(n, {})[i] = algo.detectFluores(detection.croppedImages[i])
+                dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
             '''
         #HARDWARE TRIGGER
         #if TrigBool:
             #onTrigger(udpSend)
         else:
             time.sleep(duration)
+
+    for n in range(len(detection.croppedImages)):
+        for i in range(nb_pics):
+            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
+            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
+
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
