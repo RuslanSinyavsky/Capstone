@@ -24,12 +24,17 @@ if UDP_Send in sys.modules:
         udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
 '''
 #statusUpdate("Scanning image")
-def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
+def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
     #Set T/F here
     ScanBool = True
     AnalysisBool = False
     TrigBool = False
     GraphBool = False
+
+    if check == 1:
+        print("Exclude empty droplets")
+    if check == 0:
+        print("Include empty droplets")
 
     if unit == 's':
         duration = timeinterval
@@ -98,16 +103,16 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
                 detection.detectWells(image1, min_size, max_size, True)  ## might need to be changed a bit
             '''
-            BFAnalysis(image, min_size)
-            FLAnalysis(image, min_size)
+            #BFAnalysis(image, min_size)
+            #FLAnalysis(image, min_size)
             '''           
             for i in range(len(detection.croppedImages)):
                 dataValuesFlu[n] = {i: algo.detectFluores(detection.croppedImages[i])}
                 dataValuesSize[n] = {i: algo.maxThreshCalc(detection.croppedImages[i])}
             '''
         #HARDWARE TRIGGER
-        if TrigBool:
-            onTrigger(udpSend)
+        #if TrigBool:
+            #onTrigger(udpSend)
         else:
             time.sleep(duration)
     end_time = datetime.now()
@@ -116,7 +121,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     if GraphBool:
         FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics,unit)
-
+'''
 def BFAnalysis(image, min_size):
     detection.isolateWells(image)  #creates array of isolated well images (image with black border)
     for i in range(0, len(detection.croppedImages)):  #might need to loop through circles instead of croppedimages
@@ -159,7 +164,7 @@ def FLAnalysis(image, min_size):
                 # RECORD DATA START
 
                 # RECORD DATA END
-
+'''
 def onTrigger(udp):
         print('Trigger received. Stopping incubation, starting sorting process.')
         s = 'setup.ImgTrigger()'
