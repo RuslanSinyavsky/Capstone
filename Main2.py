@@ -4,9 +4,9 @@ from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
 #import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
-#from GUI import statusUpdate
 import detectionAlgo as algo
 import cv2
+import MiddleMan as middleman
 #from GSOF_ArduBridge import UDP_Send
 
 duration = 0
@@ -34,9 +34,9 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
     TrigBool = False
     GraphBool = False
 
-    if check == 1:
+    if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
-    if check == 0:
+    if check == 0:  #Include empty droplets
         print("Include empty droplets")
 
     if unit == 's':
@@ -125,6 +125,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
     end_time = datetime.now()
+    middleman.Holder("End of incubation")
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
     if GraphBool:
