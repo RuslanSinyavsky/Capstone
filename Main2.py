@@ -16,7 +16,7 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 
-stitchedSavingFolder = 'E:\KENZA Folder\CapstoneTests'
+stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
 '''
 if UDP_Send in sys.modules:
     #setup UDP sending protocol for ArduBridge Shell.
@@ -140,12 +140,12 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
             dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
-    with open(stitchedSavingFolder + '\Data\FluData.csv', 'w') as csv_file:
+    with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in dataValuesFluT.items():
             writer.writerow([key, value])
 
-    with open(stitchedSavingFolder + '\Data\SizeData.csv', 'w') as csv_file:
+    with open(stitchedSavingFolder + '/Data/SizeData.csv', 'w') as csv_file:
         writer = csv.writer(csv_file)
         for key, value in dataValuesSizeT.items():
             writer.writerow([key, value])
@@ -221,7 +221,7 @@ def FluorGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Fluorescence growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '\FluorGraphWell' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + j + '.png')
         print("done plotting")
 
 def FilGraph(timeinterval, pics, unit):
@@ -241,7 +241,7 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder +'\FilGraph' + j + '.png')
+        plt.savefig(stitchedSavingFolder +'/FilGraph' + j + '.png')
         print("done plotting")
 
 
