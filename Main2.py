@@ -120,7 +120,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             cellFluorescence = analyzeFluorescent(min_size)
 
             for i in range(len(detection.croppedImages)):
-                dataValuesFlu.setdefault(n, {})[i] = algo.detectFluores(detection.croppedImages[i])
+                dataValuesFlu.setdefault(n, {})[i] = algo.intensityFluores(detection.croppedImages[i])
                 dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
 
 
@@ -129,11 +129,6 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             #onTrigger(udpSend)
         else:
             time.sleep(duration)
-
-    for n in range(len(detection.croppedImages)):
-        for i in range(nb_pics):
-            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
-            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
     end_time = datetime.now()
     middleman.Holder("End of incubation")
