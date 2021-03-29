@@ -20,18 +20,19 @@ Circles.isolateWells(img_BF)               #isolate wells in BF picture
 #---------------------------------------BRIGHTFIELD--------------------------------------------------------------------
 #=======================================================================================================================
 #Cropping out wells
-croppedImage = Circles.croppedImages[39] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
+croppedImage = Circles.croppedImages[41] #THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
 #plt.imshow(croppedImage)
 #plt.show()
 
 #Detect filament
 
-FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
-print("Filament size : ",detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage))
+    #FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
+    #print("Filament size : ",detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage))
 
 #Locate droplets
-CellsInsideCroppedImage = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image
+CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image
+print(len(spores))
 print(len(CellsInsideCroppedImage))
 
 #Drolet ruling out criteria
@@ -62,6 +63,7 @@ else:
 #=======================================================================================================================
 #---------------------------------------FLUORESCENCE--------------------------------------------------------------------
 #=======================================================================================================================
+'''
 
 #Isolate Fluorescent
 Circles.croppedImages.clear() #wipe the croppedimages
@@ -117,6 +119,6 @@ else:
 
 
 #Filament size max?
-
+'''
 
 cv2.waitKey(0)

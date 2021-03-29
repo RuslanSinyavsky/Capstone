@@ -52,9 +52,11 @@ def detectDroplets(c_img):
     contours, hierarchy = cv2.findContours(th.copy(), cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
 
     #print(contours[0])
+
     #cv2.drawContours(c_img, contours[0], -1, 255, 1)
     #cv2.imshow('Output', c_img)
     #cv2.waitKey(0)
+
     contours2=[]
     for i in range(0,len(contours)):
 
@@ -71,20 +73,27 @@ def detectDroplets(c_img):
         else:
             contours2.append(contours[i])
 
-    #cv2.drawContours(c_img, contours2, -1, 255, 1)
-    #cv2.imshow('Output', c_img)
-    #cv2.waitKey(0)
+
     out = np.zeros_like(c_img)
     #print(len(contours))
    # print(len(hierarchy[0][1]))
     holes = [contours2[i] for i in range(len(contours2)) if (hierarchy[0][i][2] >= 0 )]
+
     if len(holes)>0:
         del holes[0]
 
+
+
     holes2 = [contours2[i] for i in range(len(contours2)) if hierarchy[0][i][0] >= 0]
     holes3= holes+holes2
+
+    spores = [contours2[i] for i in range(len(contours2)) if hierarchy[0][i][2] != -1] #if there is a child add it to spores list
+
+
    # print("holes length =",len(holes3))
     cv2.drawContours(c_img, holes3, -1, 255, 1)
+   # print(hierarchy[0][2][2]) #the "child" of the specified contour is in position hierarchy[Next, Previous, First_Child, Parent]
+
     #img = cv2.drawContours(img, contours, -1, (0,255,0), 3)
     #cnt = contours[7]
    # (x,y),radius = cv2.minEnclosingCircle(cnt)
@@ -92,13 +101,14 @@ def detectDroplets(c_img):
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
 
-    cv2.imshow('Output', c_img)     #SHOW THE OUTLINE
-    cv2.waitKey(0)
+    #cv2.imshow('Output', c_img)     #SHOW THE OUTLINE
+    #cv2.waitKey(0)
 
    # center = (int(x),int(y))
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
-    return holes3
+    return holes3 , spores
+
 
 def detectFilament(c_img):
 

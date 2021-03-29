@@ -48,7 +48,7 @@ def detectWells(img, minimumradius, maximumradius, debugbool):
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
     # detectFluores(img)
-    circles = cv2.HoughCircles(cimg, cv2.HOUGH_GRADIENT, 1, minimumdistance,
+    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
                                param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
 
     circles = np.uint16(np.around(circles))
