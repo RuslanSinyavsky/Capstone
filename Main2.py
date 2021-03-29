@@ -1,5 +1,6 @@
 import math, time
 import sys
+import csv
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
 import PycroManagerCoreControl as pycrocontrol
@@ -118,14 +119,9 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
             detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
             cellFluorescence = analyzeFluorescent(min_size)
 
-
-            ######################################################################################
-             ##NOT SURE THIS IS VALID ANYMORE??###
             for i in range(len(detection.croppedImages)):
                 dataValuesFlu.setdefault(n, {})[i] = algo.detectFluores(detection.croppedImages[i])
                 dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
-            ######################################################################################
-
 
 
         #HARDWARE TRIGGER
@@ -143,6 +139,22 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size, check):
     middleman.Holder("End of incubation")
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
+
+    for n in range(len(detection.croppedImages)):
+        for i in range(nb_pics):
+            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
+            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
+
+    with open(stitchedSavingFolder + '\Data\FluData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesFluT.items():
+            writer.writerow([key, value])
+
+    with open(stitchedSavingFolder + '\Data\SizeData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesSizeT.items():
+            writer.writerow([key, value])
+
     if GraphBool:
         FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics,unit)
