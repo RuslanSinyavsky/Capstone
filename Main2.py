@@ -1,4 +1,5 @@
 import math, time
+import csv
 import sys
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
@@ -114,14 +115,25 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         else:
             time.sleep(duration)
 
+    end_time = datetime.now()
+    print('End of loop')
+    print('Time elapsed:', end_time - start_time)
+
     for n in range(len(detection.croppedImages)):
         for i in range(nb_pics):
             dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
             dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
-    end_time = datetime.now()
-    print('End of loop')
-    print('Time elapsed:', end_time - start_time)
+    with open(stitchedSavingFolder + '\Data\FluData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesFluT.items():
+            writer.writerow([key, value])
+
+    with open(stitchedSavingFolder + '\Data\SizeData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesSizeT.items():
+            writer.writerow([key, value])
+
     if GraphBool:
         FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics,unit)
@@ -215,3 +227,4 @@ def FilGraph(timeinterval, pics, unit):
         # showing the plot
         plt.savefig(stitchedSavingFolder +'\FilGraph' + j + '.png')
         print("done plotting")
+
