@@ -7,39 +7,43 @@ root = Tk()
 frame = Frame(root, height=300, width=380)
 frame.pack()
 
-#Labels
+# Labels
 enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
 maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
 mindropsize_label = Label(root, text="Min droplet size allowed (um^2): ")
 error_label = Label(root, text="", fg='red')
-#status_label = Label(root, text="nothing for now")
+# status_label = Label(root, text="nothing for now")
 
-#Entries
+# Entries
 nb_pics_entry = Entry(root, bd=3, width=6)
 time_entry = Entry(root, bd=3, width=6)
 maxcell_entry = Entry(root, bd=3, width=6)
 mindrop_entry = Entry(root, bd=3, width=6)
 
-#Time units option Menu
-#creating a Tkinter variable
+# Time units option Menu
+# creating a Tkinter variable
 tkvar = StringVar(root)
 
-#time unit options
+# time unit options
 time_units = ['s', 'min', 'hr']
 unit_list = OptionMenu(frame, tkvar, *time_units)
+
 
 def chooseUnit(*args):
     print("Unit chosen:", tkvar.get())
     error_label.config(text="")
+
+
 tkvar.trace('w', chooseUnit)
 
-#Buttons
+
+# Buttons
 def Setting():
     def imagingStart():
         start_btn.config(state=DISABLED)
-        #main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
+        # main.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(), int(maxcell_entry.get()), int(mindrop_entry.get()))
         main2.RunSetup(int(nb_pics_entry.get()), int(time_entry.get()), tkvar.get(),
                        int(maxcell_entry.get()), int(mindrop_entry.get()))
 
@@ -47,6 +51,11 @@ def Setting():
             and mindrop_entry.get().isdigit():
         if not tkvar.get():
             error_label.config(text="Please select a time unit to continue")
+        elif int(maxcell_entry.get()) > 100:
+            error_label.config(text="Percentage must be below 100")
+        elif int(nb_pics_entry.get()) == 0 or int(time_entry.get()) == 0 or \
+                int(maxcell_entry.get()) == 0 or int(mindrop_entry.get()) == 0:
+            error_label.config(text="Please enter value greater than 0")
         else:
             error_label.config(text="")
             root2 = Tk()
@@ -54,9 +63,10 @@ def Setting():
             frame2.pack()
             set_btn.config(state=DISABLED)
             light_warning_label = Label(root2, text="Please ensure that the light in the room is off", fg='blue')
-            lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables", fg='red')
+            lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables",
+                                       fg='red')
             status_label = Label(root2, text="STATUS")
-            #status_label.config(text=middleman.Holder())
+            # status_label.config(text=middleman.Holder())
             start_btn = Button(root2, text="Begin imaging", width=12, command=imagingStart)
             status_label.pack()
             status_label.place(x=20, y=70)
@@ -78,6 +88,7 @@ def Setting():
     else:
         error_label.config(text="Entries must be positive numerical values only")
 
+
 set_btn = Button(root, text="Set", width=5, command=Setting)
 '''
 #Checkbox
@@ -85,7 +96,7 @@ CheckVar = IntVar()    #tracks the state of the checkbutton
 C1 = Checkbutton(root, text= "Exclude empty droplets", variable = CheckVar,
                  onvalue = 1, offvalue = 0, height=2, width = 20)
 '''
-#Packing
+# Packing
 enter_param_label.pack()
 enter_param_label.place(x=100, y=10)
 
@@ -100,7 +111,6 @@ maxcellsize_label.place(x=40, y=100)
 
 mindropsize_label.pack()
 mindropsize_label.place(x=40, y=130)
-
 
 error_label.pack()
 error_label.place(x=70, y=185)
@@ -123,7 +133,6 @@ set_btn.place(x=180, y=220)
 unit_list.pack()
 unit_list.place(x=210, y=66)
 
-#C1.pack()
-#C1.place(x=30, y=150)
+# C1.pack()
+# C1.place(x=30, y=150)
 root.mainloop()
-
