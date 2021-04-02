@@ -106,24 +106,26 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 
-    for n in range(len(detection.croppedImages)):
-        for i in range(nb_pics):
-            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
-            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
+    if AnalysisBool:
+        #Sort data points and save them to csv
+        for n in range(len(detection.croppedImages)):
+            for i in range(nb_pics):
+                dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
+                dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
-    with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file)
-        for key, value in dataValuesFluT.items():
-            writer.writerow([key, value])
+        with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
+            writer = csv.writer(csv_file)
+            for key, value in dataValuesFluT.items():
+                writer.writerow([key, value])
 
-    with open(stitchedSavingFolder + '/Data/SizeData.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file)
-        for key, value in dataValuesSizeT.items():
-            writer.writerow([key, value])
-    #Plotting Graphs
-    if GraphBool:
-        FluorGraph(timeinterval, nb_pics, unit)
-        FilGraph(timeinterval, nb_pics,unit)
+        with open(stitchedSavingFolder + '/Data/SizeData.csv', 'w') as csv_file:
+            writer = csv.writer(csv_file)
+            for key, value in dataValuesSizeT.items():
+                writer.writerow([key, value])
+        #Plotting Graphs
+        if GraphBool:
+            FluorGraph(timeinterval, nb_pics, unit)
+            FilGraph(timeinterval, nb_pics,unit)
 
 def onTrigger(udp):
         print('Trigger received. Stopping incubation, starting sorting process.')
