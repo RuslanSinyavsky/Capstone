@@ -7,7 +7,9 @@ import os, sys
 from PIL import Image
 
 bridge = Bridge()
+
 core = bridge.get_core()
+
 mm = bridge.get_studio()
 pm = mm.positions()
 mmc = mm.core()

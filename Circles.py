@@ -42,14 +42,14 @@ def detectFluores(image):
 def detectWells(img, minimumradius, maximumradius, debugbool):
     # minimumradius default : 130
     # maximumradius default : 180
-    minimumdistance = 50  # minimum distance between any two cells default 150
+    minimumdistance = 150  # minimum distance between any two cells default 150
 
-    img = cv2.medianBlur(img, 5)
+    #img = cv2.medianBlur(img, 5)
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
     # detectFluores(img)
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
-                               param1=10, param2=70, minRadius=minimumradius, maxRadius=maximumradius)
+                               param1=30, param2=20, minRadius=minimumradius, maxRadius=maximumradius)
 
     circles = np.uint16(np.around(circles))
     if debugbool == True:
@@ -59,8 +59,23 @@ def detectWells(img, minimumradius, maximumradius, debugbool):
             cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
             # draw the center of the circle
             cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
-            #cv2.imshow("Debug detectwells",cimg)
-            #cv2.waitKey(0)
+
+        #debug ######
+        #scale_percent = 10 # percent of original size
+       # width = int(img.shape[1] * scale_percent / 100)
+       # height = int(img.shape[0] * scale_percent / 100)
+       # dim = (width, height)
+        # dim = (200, 200)
+       # resized = cv2.resize(cimg, dim, interpolation = cv2.INTER_AREA)
+      #  winname = "Debug detectwells"
+      #  cv2.namedWindow(winname)        # Create a named window
+       # cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+       # cv2.imshow(winname, resized)
+        ##cv2.imshow("Debug detectwells",resized)
+       # cv2.waitKey(0)
+        #debug ######
+
+
     global vCircles
     vCircles = circles  # add our Circle locations into global circles variable
 
@@ -131,8 +146,16 @@ def isolateWells(img):
         maskedImage = cv2.bitwise_and(croppedImage_raw, croppedmask)  ### THE FINAL CROPPED IMAGE WITH BLACK BACKGROUND
         croppedImages.append(maskedImage)
         pos = pos + 1
-
+        print("Done isolatewells # " ,pos, " out of ", len(circles))
         ##DEBUG PRINTOUT
+        #dim = (200, 200)
+        #resized = cv2.resize(maskedImage, dim, interpolation = cv2.INTER_AREA)
+        #winname = "Debug isolatewells"
+        #cv2.namedWindow(winname)        # Create a named window
+        #cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+        #cv2.imshow(winname, resized)
+        #cv2.waitKey(0)
+
         #cv2.imshow("Debug isolatewells",maskedImage)
         #cv2.waitKey(0)
         ##DEBUG END

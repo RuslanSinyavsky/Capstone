@@ -17,6 +17,7 @@ def intensityFluores(image):
     ret, thresh1 = cv2.threshold(gray8UC1, 30, 255, cv2.THRESH_BINARY)
     #Calculate the colored pixels to find the flourecence
     #Todo might need to change as dan doesnt like
+
     pixelCountValue = cv2.countNonZero(thresh1)
 
     #print(pixelCountValue)
@@ -51,18 +52,19 @@ def detectDroplets(c_img):
     ret,th = cv2.threshold(blur,15,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     contours, hierarchy = cv2.findContours(th.copy(), cv2.RETR_TREE , cv2.CHAIN_APPROX_NONE)
 
-    #print(contours[0])
+   # print("contours[0] ",contours[0])
 
-    #cv2.drawContours(c_img, contours[0], -1, 255, 1)
-    #cv2.imshow('Output', c_img)
-    #cv2.waitKey(0)
 
     contours2=[]
     for i in range(0,len(contours)):
 
         area = cv2.contourArea(contours[i],False)
         arch = cv2.arcLength(contours[i],False)
-        roundness = (4* math.pi * area)/math.pow(arch,2)
+        if arch >0:
+            roundness = (4* math.pi * area)/math.pow(arch,2)
+        else:
+            roundness = 0
+        #print("roundness is: ",roundness)
         #print("Roundness : ",roundness)
         if roundness <0.5 :
             #we are not sort of round
@@ -73,6 +75,10 @@ def detectDroplets(c_img):
         else:
             contours2.append(contours[i])
 
+    #image_test = c_img.copy()
+    #cv2.drawContours(image_test, contours2, -1, 255, 1) # TEST TO SEE ALL CONTOURS
+    #cv2.imshow('Output', image_test)
+    #cv2.waitKey(0)
 
     out = np.zeros_like(c_img)
     #print(len(contours))
@@ -101,8 +107,8 @@ def detectDroplets(c_img):
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
 
-    #cv2.imshow('Output', c_img)     #SHOW THE OUTLINE
-    #cv2.waitKey(0)
+    cv2.imshow('Output holes', c_img)     #SHOW THE OUTLINE
+    cv2.waitKey(0)
 
    # center = (int(x),int(y))
     #radius = int(radius)

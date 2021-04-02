@@ -7,11 +7,11 @@ from matplotlib import pyplot as plt
 
 
 #Images to use for demo
-img_BF = cv2.imread(r"C:\capstone\test3.tif", 0)       #BF image
-img_F = cv2.imread(r"C:\capstone\test1.png",0)        #FL image
+img_BF = cv2.imread(r"C:\capstone\testimage.tif", 0)       #BF image
+#img_F = cv2.imread(r"C:\capstone\test1.png",0)        #FL image
 
 #Locate Wells & isolate Brightfield
-Circles.detectWells(img_BF,80,180,True)    #detect wells in BF picture
+Circles.detectWells(img_BF,80,100,True)    #detect wells in BF picture
 Circles.isolateWells(img_BF)               #isolate wells in BF picture
 
 
@@ -32,33 +32,46 @@ croppedImage = Circles.croppedImages[41] #THE ARRAY OF ISOLATED WELL's first pic
 
 #Locate droplets
 CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.copy()) #the location of all cells inside the cropped image
-print(len(spores))
-print(len(CellsInsideCroppedImage))
 
-#Drolet ruling out criteria
-if len(CellsInsideCroppedImage) > 1:
-    #do nothing because well is invalid due to having more than 1 droplet
-    print("There is more than 1 droplet inside the well")
+for x in range(len(Circles.croppedImages)):
 
-else:
-    if len(CellsInsideCroppedImage) == 1 : #if we
-        if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
-            #if area of our individual droplet is less than 15 then remove them from array
-            print("Droplet too small, do not analyze")
-        else:
-            #Record our data
+    croppedImage = Circles.croppedImages[x]
+
+    CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.copy())
+    print("# spores ",len(spores))
+    print("# droplets ",len(CellsInsideCroppedImage))
+
+    #Drolet ruling out criteria
+    if len(CellsInsideCroppedImage) > 1:
+        #do nothing because well is invalid due to having more than 1 droplet
+        print("There is more than 1 droplet inside the well")
+
+    else:
+        if len(CellsInsideCroppedImage) == 1 : #if we
+            print("there is a droplet BUT")
+            if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
+                #if area of our individual droplet is less than 15 then remove them from array
+                print("Droplet too small, do not analyze")
+            else:
+                #Record our data
 
 
-            #end record
+                #end record
 
 
 
-            #analyze filament
-            #cnt = max(contours_isolated, key=cv2.contourArea)
-            (x,y),radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
-            print("radius of this droplet is = : ",radius)
-            print()
+                #analyze filament
 
+                FilamentsInsideCroppedImage = detectionAlgo.detectFilament(croppedImage.copy())
+                print("Filament size : ",detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage))
+
+                #cnt = max(contours_isolated, key=cv2.contourArea)
+                (x,y),radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
+                print("radius of this droplet is = : ",radius)
+
+
+    #cv2.imshow("Cropped image",croppedImage)
+    #cv2.waitKey(0)
 
 #=======================================================================================================================
 #---------------------------------------FLUORESCENCE--------------------------------------------------------------------
