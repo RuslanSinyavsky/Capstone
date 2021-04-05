@@ -4,6 +4,8 @@ import cv2
 import csv
 import numpy as np
 from matplotlib import pyplot as plt
+from collections import defaultdict
+
 
 dataValuesSize = {}
 dataValuesFlu = {}
@@ -88,6 +90,16 @@ with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
         writer.writerow([key, value])
 
 
+valuesOf = ['picutre', 'well', 'data1', 'data2', 'data3']
+trueDict = defaultdict(dict)
+
+for numPic in range(2):
+    x = "NumPic" + str(numPic)
+    for numWell in range(6):
+        r = 1
+        trueDict[x]["WellNumb" + str(numWell)] = {"Data1 ": 1,
+                                                  "Data2 ": 2,
+                                                  "Data3 ": 3}
 #=======================================================================================================================
 #---------------------------------------FLUORESCENCE--------------------------------------------------------------------
 #=======================================================================================================================
