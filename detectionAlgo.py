@@ -107,8 +107,8 @@ def detectDroplets(c_img):
     #radius = int(radius)
     #cv2.circle(c_img,center,radius,(0,255,0),2)
 
-    cv2.imshow('Output holes', c_img)     #SHOW THE OUTLINE
-    cv2.waitKey(0)
+  ##  cv2.imshow('Output holes', c_img)     #SHOW THE OUTLINE
+  ##  cv2.waitKey(0)
 
    # center = (int(x),int(y))
     #radius = int(radius)
@@ -130,8 +130,10 @@ def detectFilament(c_img):
     c_img_masked = cv2.bitwise_and(c_img, c_img, mask=mask)
     c_img_masked_not = cv2.bitwise_not(c_img_masked.copy(),c_img_masked.copy())
 
-    cv2.imshow('Output', c_img) #SHOW THE RAW PICTURE
-    cv2.waitKey(0)
+    ##cv2.imshow('Output', c_img) #SHOW THE RAW PICTURE
+    ##cv2.waitKey(0)
+
+
     #kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4,4))
     c_img_masked_dilate = cv2.dilate(c_img_masked_not, np.ones((11, 11)),2)
     c_img_masked_dilate_not = cv2.bitwise_not(c_img_masked_dilate.copy(),c_img_masked_dilate.copy())
@@ -162,9 +164,11 @@ def detectFilament(c_img):
         radius = int(radius)
         cv2.circle(th2,center,radius,255,2)
      #   print("we have: ",len(contours))
-        cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
-        cv2.imshow('Output', c_img_masked)
-        cv2.waitKey(0)
+
+       # cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
+       # cv2.imshow('Output', c_img_masked)
+       # cv2.waitKey(0)
+
 
     return contours_isolated #returns the contour of the actual filament
 

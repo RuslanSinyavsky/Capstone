@@ -39,7 +39,7 @@ def detectFluores(image):
 # # # img = cv2.medianBlur(img,5)
 #print(detectFluores(img))
 
-def detectWells(img, minimumradius, maximumradius, debugbool):
+def detectWells(img, minimumradius, maximumradius, debugbool,path):
     # minimumradius default : 130
     # maximumradius default : 180
     minimumdistance = 150  # minimum distance between any two cells default 150
@@ -53,15 +53,37 @@ def detectWells(img, minimumradius, maximumradius, debugbool):
 
     circles = np.uint16(np.around(circles))
     if debugbool == True:
+        pos=0 #used to number the wells
         # if we're debugging print out the circles over the image
         for i in circles[0, :]:
             # draw the outer circle
             cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
             # draw the center of the circle
             cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
+            cv2.putText(cimg, str(pos), (i[0],i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA) #REMOVED FOR CONFLICT WITH CONTOUR LOWER DOWN
+            pos=pos+1
 
+    if debugbool == True:
         #debug ######
-        #scale_percent = 10 # percent of original size
+        scale_percent = 30 # percent of original size
+        width = int(img.shape[1] * scale_percent / 100)
+        height = int(img.shape[0] * scale_percent / 100)
+        dim = (width, height)
+        resized = cv2.resize(cimg, dim, interpolation = cv2.INTER_AREA)
+        winname = "Debug detectwells"
+        cv2.namedWindow(winname)        # Create a named window
+        cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+        cv2.imshow(winname, resized)
+        cv2.imwrite(path + '/Data/DetectedWells.tiff',cimg)
+        cv2.waitKey(0)
+
+
+
+        #############
+
+
+
+        # # percent of original size
        # width = int(img.shape[1] * scale_percent / 100)
        # height = int(img.shape[0] * scale_percent / 100)
        # dim = (width, height)
