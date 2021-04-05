@@ -4,7 +4,10 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-
+dataValuesSize = {}
+dataValuesFlu = {}
+dataValuesFluT = {}
+dataValuesSizeT = {}
 
 #Images to use for demo
 img_BF = cv2.imread(r"C:\capstone\testimage.tif", 0)       #BF image
@@ -36,6 +39,10 @@ CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.cop
 for x in range(len(Circles.croppedImages)):
 
     croppedImage = Circles.croppedImages[x]
+
+    for i in range(len(Circles.croppedImages)):
+        dataValuesFlu.setdefault(n, {})[i] = algo.intensityFluores(detection.croppedImages[i])
+        dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
 
     CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.copy())
     print("# spores ",len(spores))
@@ -72,6 +79,10 @@ for x in range(len(Circles.croppedImages)):
 
     #cv2.imshow("Cropped image",croppedImage)
     #cv2.waitKey(0)
+
+for i in range(len(Circles.croppedImages)):
+    dataValuesFlu.setdefault("Image Number", {})[i] = detectionAlgo.intensityFluores(Circles.croppedImages[i])
+
 
 #=======================================================================================================================
 #---------------------------------------FLUORESCENCE--------------------------------------------------------------------
