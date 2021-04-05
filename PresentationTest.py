@@ -43,10 +43,6 @@ for x in range(len(Circles.croppedImages)):
 
     croppedImage = Circles.croppedImages[x]
 
-    for i in range(len(Circles.croppedImages)):
-        dataValuesFlu.setdefault(n, {})[i] = algo.intensityFluores(detection.croppedImages[i])
-        dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
-
     CellsInsideCroppedImage , spores = detectionAlgo.detectDroplets(croppedImage.copy())
     print("# spores ",len(spores))
     print("# droplets ",len(CellsInsideCroppedImage))
