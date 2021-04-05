@@ -1,6 +1,7 @@
 import detectionAlgo
 import Circles
 import cv2
+import csv
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -8,6 +9,8 @@ dataValuesSize = {}
 dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
+stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
+
 
 #Images to use for demo
 img_BF = cv2.imread(r"C:\capstone\testimage.tif", 0)       #BF image
@@ -81,7 +84,12 @@ for x in range(len(Circles.croppedImages)):
     #cv2.waitKey(0)
 
 for i in range(len(Circles.croppedImages)):
-    dataValuesFlu.setdefault("Image Number", {})[i] = detectionAlgo.intensityFluores(Circles.croppedImages[i])
+    dataValuesSize.setdefault("Image Number", {})[i] = detectionAlgo.maxThreshCalc(Circles.croppedImages[i])
+
+with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
+    writer = csv.writer(csv_file)
+    for key, value in dataValuesSize.items():
+        writer.writerow([key, value])
 
 
 #=======================================================================================================================
