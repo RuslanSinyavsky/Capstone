@@ -6,6 +6,7 @@ root = Tk()
 frame = Frame(root, height=300, width=380)
 frame.pack()
 
+root.title("Capstone GUI")
 # Labels
 enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
@@ -59,6 +60,7 @@ def Setting():
             root2 = Tk()
             frame2 = Frame(root2, height=270, width=410)
             frame2.pack()
+            root2.title("Imaging")
             set_btn.config(state=DISABLED)
             light_warning_label = Label(root2, text="Please ensure that the light in the room is off", fg='blue')
             lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables",
