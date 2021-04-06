@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import Circles as detection
 import detectionAlgo as algo
 import cv2
-import MiddleMan as middleman
 #from GSOF_ArduBridge import UDP_Send
 
 duration = 0
@@ -16,6 +15,7 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
+image_bf = 'C:/Users/mperl/IdeaProjects/Capstone/Fused.tif'
 '''
 if UDP_Send in sys.modules:
     #setup UDP sending protocol for ArduBridge Shell.
@@ -29,10 +29,10 @@ if UDP_Send in sys.modules:
 #statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     #Set T/F here
-    ScanBool = True
-    AnalysisBool = False
+    ScanBool = False
+    AnalysisBool = True
     TrigBool = False
-    GraphBool = False
+    GraphBool = True
     '''
     if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
@@ -79,16 +79,16 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             '''
         #IMAGE ANALYSIS STAGE
         if AnalysisBool:
-            #if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                #detection.detectWells(image_bf, min_size, max_size, True)  ## might need to be changed a bit
+            if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
+                detection.detectWells(image_bf, min_size, max_size, True)  ## might need to be changed a bit
 
             #Begin BF Analysis:
             detection.croppedImages.clear()  #clear the cropped images to allow for the next
-            #detection.isolateWells(image_bf)  #creates array of isolated well images (image with black border)[croppedImages]
+            detection.isolateWells(image_bf)  #creates array of isolated well images (image with black border)[croppedImages]
             filamentSize, cellRadius =  analyzeBrightfield(min_size)
 
             #Begin FL Analysis:
-            detection.croppedImages.clear()  #clear the cropped images to allow for the next
+            #detection.croppedImages.clear()  #clear the cropped images to allow for the next
             #detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
             cellFluorescence = analyzeFluorescent(min_size)
 
@@ -102,7 +102,6 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             time.sleep(duration)
 
     end_time = datetime.now()
-    middleman.Holder("End of incubation")
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 

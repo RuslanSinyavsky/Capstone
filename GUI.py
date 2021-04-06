@@ -1,7 +1,6 @@
 from tkinter import *
 import Main as main
 import Main2 as main2
-import MiddleMan as middleman
 
 root = Tk()
 frame = Frame(root, height=300, width=380)
@@ -14,7 +13,6 @@ time_label = Label(root, text="Time interval: ")
 maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
 mindropsize_label = Label(root, text="Min droplet size allowed (um^2): ")
 error_label = Label(root, text="", fg='red')
-# status_label = Label(root, text="nothing for now")
 
 # Entries
 nb_pics_entry = Entry(root, bd=3, width=6)
@@ -65,11 +63,10 @@ def Setting():
             light_warning_label = Label(root2, text="Please ensure that the light in the room is off", fg='blue')
             lamp_warning_label = Label(root2, text="Warning! Turn on the TH4 power supply before connecting cables",
                                        fg='red')
-            status_label = Label(root2, text="STATUS")
-            # status_label.config(text=middleman.Holder())
+            #status_label = Label(root2, text="STATUS")
             start_btn = Button(root2, text="Begin imaging", width=12, command=imagingStart)
-            status_label.pack()
-            status_label.place(x=20, y=70)
+            #status_label.pack()
+            #status_label.place(x=20, y=70)
 
             start_btn.pack()
             start_btn.place(x=160, y=170)
@@ -82,8 +79,8 @@ def Setting():
                 print("Closed the Imaging window"), root2
                 set_btn.config(state=NORMAL)
                 root2.destroy()
-
             root2.wm_protocol('WM_DELETE_WINDOW', lambda t=root2: close_clicked(root2))
+
             root2.mainloop()
     else:
         error_label.config(text="Entries must be positive numerical values only")
