@@ -11,8 +11,8 @@ root.title("Capstone GUI")
 enter_param_label = Label(root, text="Please set the following parameters")
 nb_pics_label = Label(root, text="Number of pictures: ")
 time_label = Label(root, text="Time interval: ")
-maxcellsize_label = Label(root, text="Max fungal surface area (% of droplet): ")
-mindropsize_label = Label(root, text="Min droplet size allowed (um^2): ")
+maxcellsize_label = Label(root, text="Max fungal radius (% of droplet): ")
+mindropsize_label = Label(root, text="Min droplet radius allowed (um): ")
 error_label = Label(root, text="", fg='red')
 
 # Entries
