@@ -61,7 +61,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             #image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
             #BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
-            #plt.imsave(BrightfieldStitchedPath, image_bf)
+            #cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----

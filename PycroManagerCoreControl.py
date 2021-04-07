@@ -91,12 +91,23 @@ def acquireImage(channelGroup,channelName, hook):
     highest = max((file.stem) for file in folder.glob('saving_name_*'))
     print(highest) #saving_name_# where #is highest number
     data_path = os.path.join(folder, highest)
+
+    folder = Path(directoryPATH)        #getting the newest folder for image stack
+    stackfolder = nameofSAVEDFILE + "_*"
+    highest = max((file.stem) for file in folder.glob(stackfolder))
+    print(highest) #saving_name_# where #is highest number
+
+
+    data_path ='E:\KENZA Folder\CapstoneTests\{}'[highest]
+
+    dataset = Dataset(data_path)
+    #dataset = acq.get_dataset()
     #dataset = acq.get_dataset()
     #print(dataset)
     #data_path=str(directoryPATH/saving_name)
     dataset = Dataset(data_path)
     print(dataset.axes)
-    
+
     length=(len(xyz))
 
     dataset_metadata = dataset.read_metadata(channel = 0 ,position=1)
@@ -104,6 +115,7 @@ def acquireImage(channelGroup,channelName, hook):
     pos=dataset_metadata["Axes"]["position"]
     print(pos)
     if(dataset):
+
         sizeimg = dataset.read_image(channel = 0, position=0)
         sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
         h,w,c = sizeimg.shape
@@ -173,6 +185,7 @@ def acquireImage(channelGroup,channelName, hook):
     winname = "test"
     cv2.namedWindow(winname)        # Create a named window
     cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+
     cv2.imshow(winname, resized)
     cv2.waitKey(0)
     '''
