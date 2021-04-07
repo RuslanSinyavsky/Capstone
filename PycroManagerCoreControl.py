@@ -6,6 +6,7 @@ import time, math
 import os, sys
 from PIL import Image
 from math import sqrt
+from pathlib import Path
 
 bridge = Bridge()
 
@@ -45,7 +46,7 @@ def hook_bf(event):
         return event
 
 def hook_fn(event, bridge, event_queue):
-        time.sleep(0.5)
+        time.sleep(0)
         return event
 
 def hook_fl(event):
@@ -75,7 +76,7 @@ def acquireImage(channelGroup,channelName, hook):
     z_array = np.array(z_array)
 
 
-    with Acquisition(directory=directoryPATH, name=nameofSAVEDFILE , pre_hardware_hook_fn=hook, post_camera_hook_fn=hook_fn) as acq:
+    with Acquisition(directory=directoryPATH, name=nameofSAVEDFILE , post_hardware_hook_fn=hook, post_camera_hook_fn=hook_fn) as acq:
         x=np.hstack([x_array[:, None]])
         y=np.hstack([y_array[:, None]])
         z=np.hstack([z_array[:, None]])
@@ -86,13 +87,16 @@ def acquireImage(channelGroup,channelName, hook):
         #acquire a 2 x 1 grid
         #acq.acquire({'row': 0, 'col': 0})
         #acq.acquire({'row': 1, 'col': 0})
-
-
-    #data_path ='E:\KENZA Folder\CapstoneTests\saving_name_18'
-    #dataset = Dataset(data_path)
-    dataset = acq.get_dataset()
+    folder = Path(directoryPATH)
+    highest = max((file.stem) for file in folder.glob('saving_name_*'))
+    print(highest) #saving_name_# where #is highest number
+    data_path = os.path.join(folder, highest)
     #dataset = acq.get_dataset()
-
+    #print(dataset)
+    #data_path=str(directoryPATH/saving_name)
+    dataset = Dataset(data_path)
+    print(dataset.axes)
+    
     length=(len(xyz))
 
     dataset_metadata = dataset.read_metadata(channel = 0 ,position=1)
@@ -100,7 +104,6 @@ def acquireImage(channelGroup,channelName, hook):
     pos=dataset_metadata["Axes"]["position"]
     print(pos)
     if(dataset):
-
         sizeimg = dataset.read_image(channel = 0, position=0)
         sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
         h,w,c = sizeimg.shape
@@ -164,16 +167,15 @@ def acquireImage(channelGroup,channelName, hook):
     dim = (width, height)
 
     resized = cv2.resize(blank_image, dim, interpolation = cv2.INTER_AREA)
+
+    '''
+    #show image
     winname = "test"
     cv2.namedWindow(winname)        # Create a named window
     cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
-
     cv2.imshow(winname, resized)
     cv2.waitKey(0)
-
-
-
-
+    '''
     return blank_image
     #plt.savefig('foo.png')
     #plt.show()
