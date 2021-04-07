@@ -95,12 +95,13 @@ def acquireImage(channelGroup,channelName, hook):
 
     length=(len(xyz))
 
-    dataset_metadata = dataset.read_metadata(position=0)
+    dataset_metadata = dataset.read_metadata(channel = 0 ,position=1)
+    print(dataset_metadata)
     pos=dataset_metadata["Axes"]["position"]
     print(pos)
     if(dataset):
 
-        sizeimg = dataset.read_image(position=0)
+        sizeimg = dataset.read_image(channel = 0, position=0)
         sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
         h,w,c = sizeimg.shape
     length=int((sqrt(length))) #size of the grid (row or column should be same technically)
@@ -108,7 +109,7 @@ def acquireImage(channelGroup,channelName, hook):
 
 
     print("image size ",blank_image.shape)
-    print(dataset_metadata)
+
     pixelsizeinum = dataset_metadata["PixelSizeUm"] #get size of pixel in um
     print(pixelsizeinum)
 
@@ -127,10 +128,10 @@ def acquireImage(channelGroup,channelName, hook):
     """
     xtotaloffset=0
     ytotaloffset=0
-    for dataposition in range(99):
+    for dataposition in range(len(xyz)): #do range for all positions in micromanager
         print(dataposition)
-        metadata = dataset.read_metadata(position=dataposition)
-        img = dataset.read_image(position=dataposition)
+        metadata = dataset.read_metadata(channel = 0,position=dataposition)
+        img = dataset.read_image(channel = 0, position=dataposition)
         img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
         img = cv2.flip(img,1)
         xoffset_um=metadata["XPosition_um_Intended"]
@@ -139,8 +140,8 @@ def acquireImage(channelGroup,channelName, hook):
         print("Intended location is : ",xoffset_um,yoffset_um)
         # cv2.imshow("test",img)
         # cv2.waitKey(0)
-        xoffset_px= (xoffset_um - dataset.read_metadata(position=0)['XPosition_um_Intended'] )/ pixelsizeinum
-        yoffset_px= (yoffset_um - dataset.read_metadata(position=0)['YPosition_um_Intended'] )/ pixelsizeinum
+        xoffset_px= (xoffset_um - dataset.read_metadata(channel = 0, position=0)['XPosition_um_Intended'] )/ pixelsizeinum
+        yoffset_px= (yoffset_um - dataset.read_metadata(channel = 0,position=0)['YPosition_um_Intended'] )/ pixelsizeinum
         xoffset_px=int(xoffset_px)
         print("Xoffset ",xoffset_px)
         #print("img max X ",blank_image.shape[0])
@@ -166,6 +167,7 @@ def acquireImage(channelGroup,channelName, hook):
     winname = "test"
     cv2.namedWindow(winname)        # Create a named window
     cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+
     cv2.imshow(winname, resized)
     cv2.waitKey(0)
 
