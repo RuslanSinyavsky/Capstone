@@ -3,11 +3,12 @@ import sys
 import csv
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-#import PycroManagerCoreControl as pycrocontrol
+import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 import cv2
-#from GSOF_ArduBridge import UDP_Send
+import MiddleMan as middleman
+from GSOF_ArduBridge import UDP_Send
 
 duration = 0
 dataValuesSize = {}
@@ -15,24 +16,22 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
-image_bf = 'C:/Users/mperl/IdeaProjects/Capstone/Fused.tif'
-'''
-if UDP_Send in sys.modules:
-    #setup UDP sending protocol for ArduBridge Shell.
-    port=7010
-    ip='127.0.0.1'
-    print('UDP active on port %d')%(port)
-    udpSend = False
-    if port > 1:
-        udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
-'''
+
+#setup UDP sending protocol for ArduBridge Shell.
+port=7010
+ip='127.0.0.1'
+print('UDP active on port '+str(port))
+udpSend = False
+if port > 1:
+    udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
+
 #statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     #Set T/F here
     ScanBool = False
-    AnalysisBool = True
-    TrigBool = False
-    GraphBool = True
+    AnalysisBool = False
+    TrigBool = True
+    GraphBool = False
     '''
     if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
@@ -59,15 +58,15 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             # BRIGHT FIELD
             # ----
-            #image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
-            #BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
-            #cv2.imwrite(BrightfieldStitchedPath, image_bf)
+            image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
+            BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
+            cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----
-            #image_fl = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", pycrocontrol.hook_fl)  #acquire FL on the ESP-XLED channel group
-            #FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
-            #plt.imsave(FluorescentStitchedPath, image_fl)
+            image_fl = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", pycrocontrol.hook_fl)  #acquire FL on the ESP-XLED channel group
+            FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
+            cv2.imwrite(FluorescentStitchedPath, image_fl)
             '''
             # ----
             # BOTH
@@ -88,49 +87,48 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             filamentSize, cellRadius =  analyzeBrightfield(min_size)
 
             #Begin FL Analysis:
-            #detection.croppedImages.clear()  #clear the cropped images to allow for the next
-            #detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+            detection.croppedImages.clear()  #clear the cropped images to allow for the next
+            detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
             cellFluorescence = analyzeFluorescent(min_size)
 
             for i in range(len(detection.croppedImages)):
                 dataValuesFlu.setdefault(n, {})[i] = algo.intensityFluores(detection.croppedImages[i])
                 dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
         #HARDWARE TRIGGER
-        #if TrigBool:
-            #onTrigger(udpSend)
+        if TrigBool:
+            onTrigger(udpSend)
         else:
             time.sleep(duration)
 
     end_time = datetime.now()
+    middleman.Holder("End of incubation")
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 
-    if AnalysisBool:
-        #Sort data points and save them to csv
-        for n in range(len(detection.croppedImages)):
-            for i in range(nb_pics):
-                dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
-                dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
+    for n in range(len(detection.croppedImages)):
+        for i in range(nb_pics):
+            dataValuesFluT.setdefault(n, {})[i] = dataValuesFlu[i][n]
+            dataValuesSizeT.setdefault(n, {})[i] = dataValuesSize[i][n]
 
-        with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
-            writer = csv.writer(csv_file)
-            for key, value in dataValuesFluT.items():
-                writer.writerow([key, value])
+    with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesFluT.items():
+            writer.writerow([key, value])
 
-        with open(stitchedSavingFolder + '/Data/SizeData.csv', 'w') as csv_file:
-            writer = csv.writer(csv_file)
-            for key, value in dataValuesSizeT.items():
-                writer.writerow([key, value])
-        #Plotting Graphs
-        if GraphBool:
-            FluorGraph(timeinterval, nb_pics, unit)
-            FilGraph(timeinterval, nb_pics,unit)
+    with open(stitchedSavingFolder + '/Data/SizeData.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        for key, value in dataValuesSizeT.items():
+            writer.writerow([key, value])
+    #Plotting Graphs
+    if GraphBool:
+        FluorGraph(timeinterval, nb_pics, unit)
+        FilGraph(timeinterval, nb_pics,unit)
 
 def onTrigger(udp):
-        print('Trigger received. Stopping incubation, starting sorting process.')
         s = 'setup.ImgTrigger()'
         if udp != False:
             udp.Send(s)
+        print('Trigger sent. Stopping incubation, starting sorting process.')
 
 def FluorGraph(timeinterval, pics, unit):
     x = []
