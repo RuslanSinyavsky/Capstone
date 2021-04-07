@@ -121,7 +121,7 @@ for i in range(len(Circles.croppedImages)):
 
 with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
-    writer.writerow([str("Well# "), str("Filament-Radius"), str("Droplet-Radius"), ("#-of-Spores"), ("Fluorescence")])
+    writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)")])
     for welldata in range(len(Circles.croppedImages)):
         writer.writerow([
             str(welldata),
