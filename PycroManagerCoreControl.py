@@ -95,7 +95,7 @@ def acquireImage(channelGroup,channelName, hook):
 
     length=(len(xyz))
 
-    dataset_metadata = dataset.read_metadata(position=10)
+    dataset_metadata = dataset.read_metadata(position=0)
     pos=dataset_metadata["Axes"]["position"]
     print(pos)
     if(dataset):
