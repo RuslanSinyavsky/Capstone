@@ -94,75 +94,84 @@ def acquireImage(channelGroup,channelName, hook):
 
     length=(len(xyz))
 
+    dataset_metadata = dataset.read_metadata(position=10)
+    pos=dataset_metadata["Axes"]["position"]
+    print(pos)
+    if(dataset):
+
+        sizeimg = dataset.read_image(position=0)
+        sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
+        h,w,c = sizeimg.shape
+    length=10 #size of the grid (row or column should be same technically)
+    blank_image = np.ones((h*(length+1),w*(length+1),3), np.uint16)
+
+
+    print("image size ",blank_image.shape)
+    print(dataset_metadata)
+    pixelsizeinum = dataset_metadata["PixelSizeUm"] #get size of pixel in um
+    print(pixelsizeinum)
+
+    """
+    for datarow in range(10):
+        for datacolumn in range(10):
+            metadata = dataset.read_metadata(row=datarow, col=datacolumn)
+            if(metadata["Axes"]["position"]>=0):
+                pos=metadata["Axes"]["position"]
+                #print(pos)
+                img = dataset.read_image(position=pos)
+            
+    
+                img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+                cv2.imshow("test",img)
+    """
+    xtotaloffset=0
+    ytotaloffset=0
+    for dataposition in range(99):
+        print(dataposition)
+        metadata = dataset.read_metadata(position=dataposition)
+        img = dataset.read_image(position=dataposition)
+        img = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+        img = cv2.flip(img,1)
+        xoffset_um=metadata["XPosition_um_Intended"]
+        yoffset_um=metadata["YPosition_um_Intended"]
+
+        print("Intended location is : ",xoffset_um,yoffset_um)
+        # cv2.imshow("test",img)
+        # cv2.waitKey(0)
+        xoffset_px= (xoffset_um - dataset.read_metadata(position=0)['XPosition_um_Intended'] )/ pixelsizeinum
+        yoffset_px= (yoffset_um - dataset.read_metadata(position=0)['YPosition_um_Intended'] )/ pixelsizeinum
+        xoffset_px=int(xoffset_px)
+        print("Xoffset ",xoffset_px)
+        #print("img max X ",blank_image.shape[0])
+        yoffset_px=int(yoffset_px)
+        print("Yoffset ",yoffset_px)
+        #print("img max Y ",blank_image.shape[1])
+
+
+        blank_image[xoffset_px:xoffset_px+(img.shape[1]), yoffset_px:yoffset_px+(img.shape[0])] += img
+        #blank_image[:yoffset_px+img.shape[0], :xoffset_px+img.shape[1]] = img
+        #blank_image = cv2.addWeighted(blank_image[yoffset_px:yoffset_px+img.shape[0], xoffset_px:xoffset_px+img.shape[1]],img)
+
+
+    ####################
+    #printout only ignore
+    ####################
+    scale_percent = 5
+    width = int(blank_image.shape[1] * scale_percent / 100)
+    height = int(blank_image.shape[0] * scale_percent / 100)
+    dim = (width, height)
+
+    resized = cv2.resize(blank_image, dim, interpolation = cv2.INTER_AREA)
+    winname = "test"
+    cv2.namedWindow(winname)        # Create a named window
+    cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+    cv2.imshow(winname, resized)
+    cv2.waitKey(0)
 
 
 
 
-
-    # 
-    # Turn this into a stitching function with argument the channel
-
-    #stitched_img = dataset.read_image(position=0)
-    #stitched_img2 = dataset.read_image(position=0)
-    #globals()['string%s' % x] = 'Hello'
-
-    #length=16
-    posrange = int(math.sqrt(length))
-    posincrement = posrange
-
-    #Stitchedrow1=stitched_img
-    #Stitchedrow2=stitched_img
-
-    #Merged1=stitched_img
-    #Merged2= stitched_img
-    stitched_image=[]
-    toggle=0
-    index=0
-    itteration=0
-    while index<length:
-        imgtable1 =[]
-        imgtable2 =[]
-        flippedimg=[]
-        if toggle==0: #only do this one once
-
-            for x_pos in range(index,posrange):
-                if index<length-1:
-                    print(index)
-
-                    img = dataset.read_image(position=index , channel_name = channelName)
-                    imgtable1.append(img)
-                    index=index+1
-
-            newimg=cv2.vconcat(imgtable1)
-            flippedimg.append(newimg)
-            toggle=1
-            posrange=index+posincrement
-            print("Finished0")
-
-            for x_pos in range(index,posrange):
-                if index<=length:
-                    print(index)
-                    index=index+1
-                    img = dataset.read_image(position=x_pos, channel_name = channelName)
-                    imgtable2.append(img)
-            imgtable2=np.flipud(imgtable2)
-            newimg=cv2.vconcat(imgtable2)
-            flippedimg.append(newimg)
-            toggle=1
-            posrange=posrange+posincrement
-            print("Finished1")
-        if toggle==1:
-            flippedimg=flippedimg[::-1]
-            flippedimg=cv2.hconcat(flippedimg)
-            stitched_image.insert(0,flippedimg) #modify this to add to bottom instead of top
-            toggle=0
-            itteration=itteration+1
-            print("FinishedCombo")
-
-    imgtoshow=cv2.hconcat(stitched_image)
-    #plt.imshow(imgtoshow)
-    #return stitched_image
-    return imgtoshow
+    return blank_image
     #plt.savefig('foo.png')
     #plt.show()
 
