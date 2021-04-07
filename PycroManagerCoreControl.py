@@ -5,6 +5,7 @@ import cv2
 import time, math
 import os, sys
 from PIL import Image
+from math import sqrt
 
 bridge = Bridge()
 
@@ -102,7 +103,7 @@ def acquireImage(channelGroup,channelName, hook):
         sizeimg = dataset.read_image(position=0)
         sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
         h,w,c = sizeimg.shape
-    length=10 #size of the grid (row or column should be same technically)
+    length=int((sqrt(length))) #size of the grid (row or column should be same technically)
     blank_image = np.ones((h*(length+1),w*(length+1),3), np.uint16)
 
 
