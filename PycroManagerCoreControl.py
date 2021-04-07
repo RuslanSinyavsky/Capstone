@@ -94,10 +94,10 @@ def acquireImage(channelGroup,channelName, hook):
     #dataset = acq.get_dataset()
 
     length=(len(xyz))
-#
-   # dataset_metadata = dataset.read_metadata(position=0)
-#   pos=dataset_metadata["Axes"]["position"]
-#    print(pos)
+
+    dataset_metadata = dataset.read_metadata(position=10)
+    pos=dataset_metadata["Axes"]["position"]
+    print(pos)
     if(dataset):
 
         sizeimg = dataset.read_image(position=0)
@@ -108,8 +108,8 @@ def acquireImage(channelGroup,channelName, hook):
 
 
     print("image size ",blank_image.shape)
-    #print(dataset_metadata)
-    pixelsizeinum = sizeimg["PixelSizeUm"] #get size of pixel in um
+    print(dataset_metadata)
+    pixelsizeinum = dataset_metadata["PixelSizeUm"] #get size of pixel in um
     print(pixelsizeinum)
 
     """
