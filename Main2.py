@@ -65,13 +65,13 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             # BRIGHT FIELD
             # ----
-            image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
+            image_bf , pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----
-            image_fl = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
+            image_fl,pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(FluorescentStitchedPath, image_fl)
             '''
@@ -83,6 +83,8 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
+       # image_bf = cv2.imread('E:\KENZA Folder\CapstoneTests\', 0)
+
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
@@ -91,7 +93,11 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # Begin BF Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
             detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-            filamentSize, cellRadius = analyzeBrightfield(min_size)
+            filamentSize , cellRadius  = analyzeBrightfield(min_size)
+
+            #converting pixels into micro meters
+            filamentSize = filamentSize*pixelsizeinum
+            cellRadius = cellRadius*pixelsizeinum
 
             # Begin FL Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
@@ -229,7 +235,7 @@ def analyzeBrightfield(min_size):
         else:
             if len(CellsInsideCroppedImage) == 1:  # if we
                 print("there is a droplet BUT")
-                if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
+                if (cv2.contourArea(CellsInsideCroppedImage[0]) < min_size):
                     # if area of our individual droplet is less than 15 then remove them from array
                     print("Droplet too small, do not analyze")
 

@@ -189,7 +189,7 @@ def acquireImage(channelGroup,channelName, hook):
     cv2.imshow(winname, resized)
     cv2.waitKey(0)
     '''
-    return blank_image
+    return blank_image , pixelsizeinum
     #plt.savefig('foo.png')
     #plt.show()
 
