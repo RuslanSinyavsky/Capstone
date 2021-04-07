@@ -95,7 +95,9 @@ for x in range(len(Circles.croppedImages)):
                 trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
                     "Filament Radius ": detectionAlgo.maxThreshCalc(FilamentsInsideCroppedImage),
                     "Droplet Radius ": radius,
-                    "# of spores ": len(spores)}
+                    "# of spores ": len(spores)
+                    #,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
+                    }
 
     # cv2.imshow("Cropped image",croppedImage)
     # cv2.waitKey(0)
@@ -119,13 +121,14 @@ for i in range(len(Circles.croppedImages)):
 
 with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
-    writer.writerow([str("Well# "), str("Filament-Radius"), str("Droplet-Radius"), ("#-of-Spores")])
+    writer.writerow([str("Well# "), str("Filament-Radius"), str("Droplet-Radius"), ("#-of-Spores"), ("Fluorescence")])
     for welldata in range(len(Circles.croppedImages)):
         writer.writerow([
             str(welldata),
             str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Filament Radius ']),
             str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Droplet Radius ']),
             str(trueDict['NumPic0']['WellNumb' + str(welldata)]['# of spores '])
+            # ,str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Fluorescence '])
         ])
 
 # =======================================================================================================================
