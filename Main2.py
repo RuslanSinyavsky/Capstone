@@ -98,23 +98,24 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
                 detection.detectWells(image_bf, True , stitchedSavingFolder)  ## might need to be changed a bit
 
-            # Begin BF Analysis:
-            detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-            filamentSize , cellRadius  = analyzeBrightfield(min_size)
+            for x in range(len(detection.croppedImages)):
+                # Begin BF Analysis:
+                detection.croppedImages.clear()  # clear the cropped images to allow for the next
+                detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+                filamentSize , cellRadius  = analyzeBrightfield(min_size,x)
 
-            #converting pixels into micro meters
-            filamentSize = filamentSize*pixelsizeinum
-            cellRadius = cellRadius*pixelsizeinum
+                #converting pixels into micro meters
+                filamentSize = filamentSize*pixelsizeinum
+                cellRadius = cellRadius*pixelsizeinum
 
-            # Begin FL Analysis:
-            detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
-            cellFluorescence = analyzeFluorescent(min_size)
+                # Begin FL Analysis:
+                detection.croppedImages.clear()  # clear the cropped images to allow for the next
+                detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+                cellFluorescence = analyzeFluorescent(min_size)
 
-            for i in range(len(detection.croppedImages)):
-                dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
-                dataValuesSize.setdefault(n, {})[i] = filamentSize
+                for i in range(len(detection.croppedImages)):
+                    dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
+                    dataValuesSize.setdefault(n, {})[i] = filamentSize
         # HARDWARE TRIGGER
         if TrigBool:
 
@@ -201,8 +202,8 @@ def FilGraph(timeinterval, pics, unit):
         print("done plotting")
 
 
-def analyzeBrightfield(min_size):
-    for x in range(len(detection.croppedImages)):
+def analyzeBrightfield(min_size,x):
+
         print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
         print("WELL NUMBER (X) : ", str(x))
         dictionarykeyvalue = "NumPic" + str(x)
@@ -264,7 +265,7 @@ def analyzeBrightfield(min_size):
                         # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
                     }
 
-    return filsize, radius
+        return filsize, radius
 
 
 def analyzeFluorescent(min_size):
