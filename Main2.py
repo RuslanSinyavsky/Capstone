@@ -36,7 +36,7 @@ if port > 1:
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # Set T/F here
-    ScanBool = False
+    ScanBool = True
     AnalysisBool = True
     TrigBool = False
     GraphBool = False
@@ -88,7 +88,9 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             #todo#######
             #todo## FOR TESTING ONLY vvvvvv
        # image_bf = cv2.imread('E:\KENZA Folder\CapstoneTests\', 0)
-        image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
+        #image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_252')
+        #BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
+        #cv2.imwrite(BrightfieldStitchedPath, image_bf)
             #todo### FOR TESTING ONLY ^^^^^^
             #todo#######
             #todo#######
