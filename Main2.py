@@ -36,7 +36,7 @@ if port > 1:
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # Set T/F here
-    ScanBool = True
+    ScanBool = False
     AnalysisBool = True
     TrigBool = False
     GraphBool = False
@@ -66,13 +66,15 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             # BRIGHT FIELD
             # ----
-            image_bf , pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
+            image_bf, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",
+                                                                pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----
-            image_fl,pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
+            image_fl, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",
+                                                                pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(FluorescentStitchedPath, image_fl)
             '''
@@ -84,34 +86,34 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
-            #todo#######
-            #todo#######
-            #todo## FOR TESTING ONLY vvvvvv
-       # image_bf = cv2.imread('E:\KENZA Folder\CapstoneTests\', 0)
-        #image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_252')
-        #BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
-        #cv2.imwrite(BrightfieldStitchedPath, image_bf)
-            #todo### FOR TESTING ONLY ^^^^^^
-            #todo#######
-            #todo#######
+            # todo#######
+            # todo#######
+            # todo## FOR TESTING ONLY vvvvvv
+
+        image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
+        # todo### FOR TESTING ONLY ^^^^^^
+        # todo#######
+        # todo#######
 
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                detection.detectWells(image_bf, True , stitchedSavingFolder)  ## might need to be changed a bit
+                detection.detectWells(image_bf, True, stitchedSavingFolder)  ## might need to be changed a bit
 
             # Begin BF Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-            filamentSize , cellRadius  = analyzeBrightfield(min_size)
+            detection.isolateWells(
+                image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+            filamentSize, cellRadius = analyzeBrightfield(min_size)
 
-            #converting pixels into micro meters
-            filamentSize = filamentSize*pixelsizeinum
-            cellRadius = cellRadius*pixelsizeinum
+            # converting pixels into micro meters
+            filamentSize = filamentSize * pixelsizeinum
+            cellRadius = cellRadius * pixelsizeinum
 
             # Begin FL Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
-            detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+            detection.isolateWells(
+                image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
             cellFluorescence = analyzeFluorescent(min_size)
 
             for i in range(len(detection.croppedImages)):
@@ -120,32 +122,32 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # HARDWARE TRIGGER
         if TrigBool:
 
-           # if(((filamentSize/cellRadius)*100)>=(max_size)):
+            # if(((filamentSize/cellRadius)*100)>=(max_size)):
 
-                # onTrigger(udpSend)
-                print("TRIGGERED TO STOP/DUMP DROPLETS")
+            # onTrigger(udpSend)
+            print("TRIGGERED TO STOP/DUMP DROPLETS")
 
-                break;
+            break;
         else:
             time.sleep(duration)
 
-        #WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
-        with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
+        # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
+        with open(stitchedSavingFolder + '/Data/FluData' + str(datetime.now()) + '.csv', 'w') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)")])
+            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
+                             ("Fluorescence(pxls)")])
             for welldata in range(len(detection.croppedImages)):
                 writer.writerow([
                     str(welldata),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Filament Radius ']),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Droplet Radius ']),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['# of spores '])
-                    # ,str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Fluorescence '])
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
                 ])
 
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
-
 
     # Plotting Graphs
     if GraphBool:
@@ -178,7 +180,7 @@ def FluorGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Fluorescence growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
         print("done plotting")
 
 
@@ -199,7 +201,7 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FilGraph' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
         print("done plotting")
 
 
