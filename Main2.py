@@ -7,8 +7,10 @@ import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 import cv2
-#import MiddleMan as middleman
-#from GSOF_ArduBridge import UDP_Send
+from collections import defaultdict
+
+# import MiddleMan as middleman
+# from GSOF_ArduBridge import UDP_Send
 
 duration = 0
 dataValuesSize = {}
@@ -16,6 +18,9 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
+
+trueDict = defaultdict(dict)
+
 '''
 #setup UDP sending protocol for ArduBridge Shell.
 port=7010
@@ -26,9 +31,10 @@ if port > 1:
     udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
 '''
 
-#statusUpdate("Scanning image")
+
+# statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
-    #Set T/F here
+    # Set T/F here
     ScanBool = False
     AnalysisBool = False
     TrigBool = True
@@ -50,22 +56,22 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         print("time received (s):", duration)
 
     start_time = datetime.now()
-    for n in range(nb_pics):  #OUR MAIN LOOP
-        #SCANNING STAGE
+    for n in range(nb_pics):  # OUR MAIN LOOP
+        # SCANNING STAGE
         if ScanBool:
             print("Scanning image", n + 1)
-            #gui.statusUpdate("Scanning image", n + 1)
+            # gui.statusUpdate("Scanning image", n + 1)
 
             # ----
             # BRIGHT FIELD
             # ----
-            image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF", pycrocontrol.hook_bf)  #acquire BF on the ESP-XLED channel group
+            image_bf = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----
-            image_fl = pycrocontrol.acquireImage("ESP-XLED", "Resorufin", pycrocontrol.hook_fl)  #acquire FL on the ESP-XLED channel group
+            image_fl = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             cv2.imwrite(FluorescentStitchedPath, image_fl)
             '''
@@ -77,30 +83,48 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
-        #IMAGE ANALYSIS STAGE
+        # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                detection.detectWells(image_bf, min_size, max_size, True)  ## might need to be changed a bit
+                detection.detectWells(image_bf,  True)  ## might need to be changed a bit
 
-            #Begin BF Analysis:
-            detection.croppedImages.clear()  #clear the cropped images to allow for the next
-            detection.isolateWells(image_bf)  #creates array of isolated well images (image with black border)[croppedImages]
-            filamentSize, cellRadius =  analyzeBrightfield(min_size)
+            # Begin BF Analysis:
+            detection.croppedImages.clear()  # clear the cropped images to allow for the next
+            detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+            filamentSize, cellRadius = analyzeBrightfield(min_size)
 
-            #Begin FL Analysis:
-            detection.croppedImages.clear()  #clear the cropped images to allow for the next
+            # Begin FL Analysis:
+            detection.croppedImages.clear()  # clear the cropped images to allow for the next
             detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
             cellFluorescence = analyzeFluorescent(min_size)
 
             for i in range(len(detection.croppedImages)):
-                dataValuesFlu.setdefault(n, {})[i] = algo.intensityFluores(detection.croppedImages[i])
-                dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
-        #HARDWARE TRIGGER
+                dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
+                dataValuesSize.setdefault(n, {})[i] = filamentSize
+        # HARDWARE TRIGGER
         if TrigBool:
-           # onTrigger(udpSend)
-            print("TRIGGERED TO STOP/DUMP DROPLETS")
+
+           # if(((filamentSize/cellRadius)*100)>=(max_size)):
+
+                # onTrigger(udpSend)
+                print("TRIGGERED TO STOP/DUMP DROPLETS")
+
+                break;
         else:
             time.sleep(duration)
+
+        #WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
+        with open(stitchedSavingFolder + '/Data/FluData.csv', 'w') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)")])
+            for welldata in range(len(detection.croppedImages)):
+                writer.writerow([
+                    str(welldata),
+                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Filament Radius ']),
+                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Droplet Radius ']),
+                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['# of spores '])
+                    # ,str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Fluorescence '])
+                ])
 
     end_time = datetime.now()
     print('End of loop')
@@ -120,16 +144,18 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         writer = csv.writer(csv_file)
         for key, value in dataValuesSizeT.items():
             writer.writerow([key, value])
-    #Plotting Graphs
+    # Plotting Graphs
     if GraphBool:
         FluorGraph(timeinterval, nb_pics, unit)
-        FilGraph(timeinterval, nb_pics,unit)
+        FilGraph(timeinterval, nb_pics, unit)
+
 
 def onTrigger(udp):
-        s = 'setup.ImgTrigger()'
-        if udp != False:
-            udp.Send(s)
-        print('Trigger sent. Stopping incubation, starting sorting process.')
+    s = 'setup.ImgTrigger()'
+    if udp != False:
+        udp.Send(s)
+    print('Trigger sent. Stopping incubation, starting sorting process.')
+
 
 def FluorGraph(timeinterval, pics, unit):
     x = []
@@ -152,6 +178,7 @@ def FluorGraph(timeinterval, pics, unit):
         plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + j + '.png')
         print("done plotting")
 
+
 def FilGraph(timeinterval, pics, unit):
     x = []
     y = []
@@ -169,32 +196,75 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder +'/FilGraph' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FilGraph' + j + '.png')
         print("done plotting")
 
+
 def analyzeBrightfield(min_size):
-    for i in range(0, len(detection.croppedImages)):  #might need to loop through circles instead of croppedimages
-        dropletsinside = algo.detectDroplets(detection.croppedImages[i])
-        if len(dropletsinside) > 1:
+    for x in range(len(detection.croppedImages)):
+        print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
+        print("WELL NUMBER (X) : ", str(x))
+        dictionarykeyvalue = "NumPic" + str(x)
+
+        croppedImage = detection.croppedImages[x]
+
+        CellsInsideCroppedImage, spores = algo.detectDroplets(croppedImage.copy())
+        print("# spores ", len(spores))
+        print("# droplets ", len(CellsInsideCroppedImage))
+
+        # Drolet ruling out criteria
+        if len(CellsInsideCroppedImage) > 1:
             # do nothing because well is invalid due to having more than 1 droplet
-            time.sleep(0)
+            print("There is more than 1 droplet inside the well")
+
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "TOOMANYDROPLETS",
+                                                                 "Droplet Radius ": "Nill",
+                                                                 "# of spores ": "Nill"}
+
+        if len(CellsInsideCroppedImage) < 1:
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "NODROPLET",
+                                                                 "Droplet Radius ": "Nill",
+                                                                 "# of spores ": "Nill"}
+
         else:
-            if (cv2.contourArea(dropletsinside[0]) < min_size):
-                #if area of our individual droplet is less than min_size then remove them from array
-                print("Droplet too small, do not analyze")
-            else:
-                #detect filaments size in BF
-                FilamentsInsideCroppedImage = algo.detectFilament(detection.croppedImages[i].copy())
-                filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
-                print("Filament size: ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
-                #RECORD DATA START
+            if len(CellsInsideCroppedImage) == 1:  # if we
+                print("there is a droplet BUT")
+                if (cv2.contourArea(CellsInsideCroppedImage[0]) < 15):
+                    # if area of our individual droplet is less than 15 then remove them from array
+                    print("Droplet too small, do not analyze")
 
-                #RECORD DATA END
-                (x, y), radius = cv2.minEnclosingCircle((dropletsinside[0]))
-                print("radius of this droplet is = : ", radius)
-                # ^^^^ use this to detect abortion criteria ^^^^
+                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
+                                                                         "Droplet Radius ": "Nill",
+                                                                         "# of spores ": "Nill"}
+                else:
+                    # Record our data
 
-    return filsize , radius
+                    # end record
+
+                    # analyze filament
+
+                    FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
+                    filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
+                    print("Filament size(radius) : ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
+
+                    # cnt = max(contours_isolated, key=cv2.contourArea)
+                    (z, y), radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
+                    print("radius of this droplet is = : ", radius)
+
+                    # storing data into dictionary
+
+                    dataValuesSize.setdefault("Image Number", {})[x] = algo.maxThreshCalc(
+                        FilamentsInsideCroppedImage)
+
+                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
+                        "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
+                        "Droplet Radius ": radius,
+                        "# of spores ": len(spores)
+                        # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
+                    }
+
+    return filsize, radius
+
 
 def analyzeFluorescent(min_size):
     for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages

@@ -17,7 +17,7 @@ img_BF = cv2.imread(r"C:\capstone\testimage.tif", 0)  # BF image
 # img_F = cv2.imread(r"C:\capstone\test1.png",0)        #FL image
 
 # Locate Wells & isolate Brightfield
-Circles.detectWells(img_BF, 80, 100, True, stitchedSavingFolder)  # detect wells in BF picture
+Circles.detectWells(img_BF,  True, stitchedSavingFolder)  # detect wells in BF picture
 Circles.isolateWells(img_BF)  # isolate wells in BF picture
 
 # =======================================================================================================================

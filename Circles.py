@@ -39,17 +39,18 @@ def detectFluores(image):
 # # # img = cv2.medianBlur(img,5)
 #print(detectFluores(img))
 
-def detectWells(img, minimumradius, maximumradius, debugbool,path):
+def detectWells(img, debugbool,path):
     # minimumradius default : 130
     # maximumradius default : 180
     minimumdistance = 150  # minimum distance between any two cells default 150
+    minimumwellradius = 80
 
     #img = cv2.medianBlur(img, 5)
     cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
     # detectFluores(img)
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
-                               param1=30, param2=20, minRadius=minimumradius, maxRadius=maximumradius)
+                               param1=30, param2=20, minRadius=minimumwellradius, maxRadius=100)
 
     circles = np.uint16(np.around(circles))
     if debugbool == True:
