@@ -87,7 +87,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             #todo#######
             #todo#######
             #todo## FOR TESTING ONLY vvvvvv
-       # image_bf = cv2.imread('E:\KENZA Folder\CapstoneTests\', 0)
+
         image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
             #todo### FOR TESTING ONLY ^^^^^^
             #todo#######
@@ -134,10 +134,10 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             for welldata in range(len(detection.croppedImages)):
                 writer.writerow([
                     str(welldata),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Filament Radius ']),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Droplet Radius ']),
-                    str(trueDict['NumPic0']['WellNumb' + str(welldata)]['# of spores '])
-                    # ,str(trueDict['NumPic0']['WellNumb' + str(welldata)]['Fluorescence '])
+                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
+                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
+                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['# of spores ']),
+                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
                 ])
 
     end_time = datetime.now()
