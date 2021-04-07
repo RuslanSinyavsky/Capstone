@@ -96,7 +96,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                detection.detectWells(image_bf,  True)  ## might need to be changed a bit
+                detection.detectWells(image_bf, True , stitchedSavingFolder)  ## might need to be changed a bit
 
             # Begin BF Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
