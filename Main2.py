@@ -7,8 +7,8 @@ import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 import cv2
-import MiddleMan as middleman
-from GSOF_ArduBridge import UDP_Send
+#import MiddleMan as middleman
+#from GSOF_ArduBridge import UDP_Send
 
 duration = 0
 dataValuesSize = {}
@@ -16,7 +16,7 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
-
+'''
 #setup UDP sending protocol for ArduBridge Shell.
 port=7010
 ip='127.0.0.1'
@@ -24,6 +24,7 @@ print('UDP active on port '+str(port))
 udpSend = False
 if port > 1:
     udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
+'''
 
 #statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
@@ -96,12 +97,12 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 dataValuesSize.setdefault(n, {})[i] = algo.maxThreshCalc(detection.croppedImages[i])
         #HARDWARE TRIGGER
         if TrigBool:
-            onTrigger(udpSend)
+           # onTrigger(udpSend)
+            print("TRIGGERED TO STOP/DUMP DROPLETS")
         else:
             time.sleep(duration)
 
     end_time = datetime.now()
-    middleman.Holder("End of incubation")
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 
