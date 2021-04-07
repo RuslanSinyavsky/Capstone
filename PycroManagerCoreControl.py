@@ -92,14 +92,6 @@ def acquireImage(channelGroup,channelName, hook):
     print(highest) #saving_name_# where #is highest number
     data_path = os.path.join(folder, highest)
 
-    folder = Path(directoryPATH)        #getting the newest folder for image stack
-    stackfolder = nameofSAVEDFILE + "_*"
-    highest = max((file.stem) for file in folder.glob(stackfolder))
-    print(highest) #saving_name_# where #is highest number
-
-
-    data_path ='E:\KENZA Folder\CapstoneTests\{}'[highest]
-
     dataset = Dataset(data_path)
     #dataset = acq.get_dataset()
     #dataset = acq.get_dataset()

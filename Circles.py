@@ -46,7 +46,8 @@ def detectWells(img, debugbool,path):
     minimumwellradius = 80
 
     #img = cv2.medianBlur(img, 5)
-    cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    #cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    cimg=img
 
     # detectFluores(img)
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
