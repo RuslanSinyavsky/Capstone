@@ -7,6 +7,7 @@ import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 import cv2
+import stitchingopencv
 from collections import defaultdict
 
 # import MiddleMan as middleman
@@ -83,7 +84,14 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
+            #todo#######
+            #todo#######
+            #todo## FOR TESTING ONLY vvvvvv
        # image_bf = cv2.imread('E:\KENZA Folder\CapstoneTests\', 0)
+        image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
+            #todo### FOR TESTING ONLY ^^^^^^
+            #todo#######
+            #todo#######
 
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
