@@ -45,7 +45,7 @@ def hook_bf(event):
         return event
 
 def hook_fn(event, bridge, event_queue):
-        event_queue.put(None)
+        time.sleep(0.5)
         return event
 
 def hook_fl(event):
@@ -95,7 +95,7 @@ def acquireImage(channelGroup,channelName, hook):
 
     length=(len(xyz))
 
-    dataset_metadata = dataset.read_metadata(position=10)
+    dataset_metadata = dataset.read_metadata(position=0)
     pos=dataset_metadata["Axes"]["position"]
     print(pos)
     if(dataset):
