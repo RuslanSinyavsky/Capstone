@@ -3,7 +3,7 @@ import sys
 import csv
 from datetime import timedelta, datetime
 import matplotlib.pyplot as plt
-#import PycroManagerCoreControl as pycrocontrol
+# import PycroManagerCoreControl as pycrocontrol
 import Circles as detection
 import detectionAlgo as algo
 import cv2
@@ -18,7 +18,7 @@ dataValuesSize = {}
 dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
-#stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
+# stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
 stitchedSavingFolder = 'C:/capstone'
 trueDict = defaultdict(dict)
 image_bf = cv2.imread(r"C:\capstone\testimage.tif", 0)  # BF image
@@ -67,15 +67,15 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             # BRIGHT FIELD
             # ----
-            #image_bf, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
+            # image_bf, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
-            #cv2.imwrite(BrightfieldStitchedPath, image_bf)
+            # cv2.imwrite(BrightfieldStitchedPath, image_bf)
             # ----
             # FLUORESCENT
             # ----
-            #image_fl, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
+            # image_fl, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
-            #cv2.imwrite(FluorescentStitchedPath, image_fl)
+            # cv2.imwrite(FluorescentStitchedPath, image_fl)
             '''
             # ----
             # BOTH
@@ -85,13 +85,13 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
             plt.imsave(FluorescentStitchedPath, image)
             '''
-            #todo#######
-            #todo#######
-            #todo## FOR TESTING ONLY vvvvvv
+            # todo#######
+            # todo#######
+            # todo## FOR TESTING ONLY vvvvvv
 
-        #image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
-        #BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
-        #cv2.imwrite(BrightfieldStitchedPath, image_bf)
+        # image_bf = stitchingopencv.direct_stitch('E:\KENZA Folder\CapstoneTests\saving_name_233')
+        # BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
+        # cv2.imwrite(BrightfieldStitchedPath, image_bf)
         # todo### FOR TESTING ONLY ^^^^^^
         # todo#######
         # todo#######
@@ -99,24 +99,24 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                detection.detectWells(image_bf, True , stitchedSavingFolder)  ## might need to be changed a bit
+                detection.detectWells(image_bf, True, stitchedSavingFolder)  ## might need to be changed a bit
 
             for x in range(len(detection.croppedImages)):
                 # Begin BF Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-                filamentSize , cellRadius  = analyzeBrightfield(min_size,x)
+                detection.isolateWells(
+                    image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+                filamentSize, cellRadius = analyzeBrightfield(min_size, x)
 
                 pixelsizeinum = 0.3243
-                #converting pixels into micro meters
-                filamentSize = filamentSize*pixelsizeinum
-                cellRadius = cellRadius*pixelsizeinum
+                # converting pixels into micro meters
+                filamentSize = filamentSize * pixelsizeinum
+                cellRadius = cellRadius * pixelsizeinum
 
                 # Begin FL Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                #detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+                # detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
                 cellFluorescence = analyzeFluorescent(min_size)
-
 
                 for i in range(len(detection.croppedImages)):
                     dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
@@ -133,23 +133,23 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         else:
             time.sleep(duration)
 
-        #WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
-        with open(stitchedSavingFolder + '/Data/ImageData.csv', 'w') as csv_file:
+        # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
+        with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now()) + '.csv', 'w') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)")])
+            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
+                             ("Fluorescence(pxls)")])
             for welldata in range(len(detection.croppedImages)):
                 writer.writerow([
                     str(welldata),
-                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
-                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
-                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['# of spores ']),
-                    str(trueDict['NumPic'+str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
                 ])
 
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
-
 
     # Plotting Graphs
     if GraphBool:
@@ -169,7 +169,7 @@ def FluorGraph(timeinterval, pics, unit):
     y = []
     for i in range(pics):
         x.append(timeinterval + (timeinterval * i))
-    #print("x axis", x)
+    # print("x axis", x)
     for j in range(len(detection.croppedImages)):
         for i in range(pics):
             y.append(dataValuesFlu[i][j])
@@ -182,7 +182,7 @@ def FluorGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Fluorescence growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
         print("done plotting")
 
 
@@ -203,12 +203,11 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FilGraph' + j + '.png')
+        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
         print("done plotting")
 
 
-def analyzeBrightfield(min_size,x):
-
+def analyzeBrightfield(min_size, x):
     print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
     print("WELL NUMBER (X) : ", str(x))
     dictionarykeyvalue = "NumPic" + str(x)
