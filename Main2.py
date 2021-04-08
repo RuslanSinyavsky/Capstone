@@ -178,7 +178,7 @@ def FluorGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Fluorescence growth over incubation period')
         # showing the plot
-        plt.savefig(graphPath + '/FluorGraphWell' + str(wellNumber) + ' ' + str(
+        plt.savefig(graphPath + '/FluorGraphWell_' + str(wellNumber) + '_' + str(
             datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
         plt.close()
         y.clear()
@@ -204,7 +204,7 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(graphPath + '/FilGraphWell' + str(wellNumber) + ' ' + str(
+        plt.savefig(graphPath + '/FilGraphWell_' + str(wellNumber) + '_' + str(
             datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
         plt.close()
         y.clear()
