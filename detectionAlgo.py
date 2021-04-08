@@ -166,8 +166,8 @@ def detectFilament(c_img):
      #   print("we have: ",len(contours))
 
         cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
-        cv2.imshow('Output', c_img_masked)
-        cv2.waitKey(0)
+       # cv2.imshow('Output', c_img_masked)
+       # cv2.waitKey(0)
 
 
     return contours_isolated #returns the contour of the actual filament

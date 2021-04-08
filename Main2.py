@@ -143,7 +143,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores '])
-                    #,str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
+                    ,str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
                 ])
 
     end_time = datetime.now()
@@ -213,6 +213,7 @@ def FilGraph(timeinterval, pics, unit):
 
 def analyzeBrightfield(min_size, n,max_size):
     for x in range(len(detection.croppedImages)):
+        brightfieldData=[]
         print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
         print("WELL NUMBER (X) : ", str(x))
         dictionarykeyvalue = "NumPic" + str(n)
@@ -265,7 +266,7 @@ def analyzeBrightfield(min_size, n,max_size):
 
                     # storing data into dictionary
 
-                    dataValuesSize.setdefault("Image Number"+str(n), {})[x] = algo.maxThreshCalc(FilamentsInsideCroppedImage)
+                    #dataValuesSize.setdefault("Image Number"+str(n), {})[x] = algo.maxThreshCalc(FilamentsInsideCroppedImage)
 
                     trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
                         "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
@@ -293,30 +294,11 @@ def analyzeBrightfield(min_size, n,max_size):
 def analyzeFluorescent(min_size, n):
     for i in range(len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
         dropletsinside = algo.detectDroplets(detection.croppedImages[i])
-        if len(dropletsinside) > 1:
-            # do nothing because well is invalid due to having more than 1 droplet
-            time.sleep(0)
-        else:
-            # detects fluorescence is FL picture
-            # Droplet ruling out criteria
-            if (cv2.contourArea(dropletsinside[0]) < min_size):
-                # if area of our individual droplet is less than min_size then remove them from array
-                print("Droplet too small, do not analyze")
-            else:
-                # Record our data
-                cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
-                print("Cell fluorescence: ", cellFluorescence)
-                # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
-                with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
-                          'w') as csv_file:
-                    writer = csv.writer(csv_file)
-                    writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
-                                     ("Fluorescence(pxls)")])
-                    for welldata in range(len(detection.croppedImages)):
-                        writer.writerow([
-                            str(welldata)
+        dictionarykeyvalue = "NumPic" + str(n)
 
-                            ,str(trueDict["NumPic" + str(n)]["WellNumb" + str(welldata)]["Fluorescence "])
-                        ])
+        cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
+        print("Cell fluorescence: ", cellFluorescence)
+        trueDict[dictionarykeyvalue]["WellNumb" + str(i)]["Fluorescence "] = cellFluorescence
+
 
 
