@@ -19,7 +19,7 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 # stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
-stitchedSavingFolder = 'C:/capstone'
+stitchedSavingFolder = 'C:/capstone/Data'
 trueDict = defaultdict(dict)
 image_bf = cv2.imread(r"C:\capstone\testimage.tif", 0)  # BF image
 
@@ -99,13 +99,12 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # IMAGE ANALYSIS STAGE
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
-                detection.detectWells(image_bf, True, stitchedSavingFolder)  ## might need to be changed a bit
+                detection.detectWells(image_bf, True, stitchedSavingFolder)
 
             for x in range(len(detection.croppedImages)):
                 # Begin BF Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                detection.isolateWells(
-                    image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+                detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
                 filamentSize, cellRadius = analyzeBrightfield(min_size, x)
 
                 pixelsizeinum = 0.3243
