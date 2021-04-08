@@ -16,10 +16,9 @@ from collections import defaultdict
 duration = 0
 dataValuesSize = {}
 dataValuesFlu = {}
-dataValuesFluT = {}
-dataValuesSizeT = {}
 # stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
 stitchedSavingFolder = 'C:/capstone'
+graphPath = 'C:/capstone/Graph'
 trueDict = defaultdict(dict)
 image_bf = cv2.imread(r"C:\capstone\test3.tif", 0)  # BF image
 image_fl = cv2.imread(r"C:\capstone\test1.png", 0)  # BF image
@@ -104,17 +103,14 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 detection.detectWells(image_bf, True, stitchedSavingFolder)
 
 
-                # Begin BF Analysis:
-                detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-                analyzeBrightfield(min_size, n,max_size)
-
-
-
-                # Begin FL Analysis:
-                detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
-                analyzeFluorescent(min_size, n)
+            # Begin BF Analysis:
+            detection.croppedImages.clear()  # clear the cropped images to allow for the next
+            detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
+            analyzeBrightfield(min_size, n,max_size)
+            # Begin FL Analysis:
+            detection.croppedImages.clear()  # clear the cropped images to allow for the next
+            detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+            analyzeFluorescent(min_size, n)
 
 
 
@@ -134,10 +130,10 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             time.sleep(duration)
 
         # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
-        with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
+        with open(stitchedSavingFolder + '/Data/ImageData' + str(n) + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
                   'w') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)"), ("Status")])
+            writer.writerow([str("Well#"), str("Filament-Radius(µm)"), str("Droplet-Radius(µm)"), ("#-of-Spores"), ("Fluorescence(pxls)"), ("Status")])
             for welldata in range(len(detection.croppedImages)):
                 writer.writerow([
                     str(welldata),
@@ -146,18 +142,15 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Status '])
-
-
                 ])
 
     end_time = datetime.now()
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 
-    print("THIS IS MY SHT", trueDict["NumPic0"]["WellNumb0"]["Filament Radius "])
     # Plotting Graphs
     if GraphBool:
-        #FluorGraph(timeinterval, nb_pics, unit)
+        FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics, unit)
 
 
@@ -171,48 +164,51 @@ def onTrigger(udp):
 def FluorGraph(timeinterval, pics, unit):
     x = []
     y = []
-    for i in range(pics):
-        x.append(timeinterval + (timeinterval * i))
-    # print("x axis", x)
-    for j in range(len(detection.croppedImages)):
+
+    for wellNumber in range(len(detection.croppedImages)):
+        for pictureNumber in range(pics):
+            y.append(trueDict["NumPic"+str(pictureNumber)]["WellNumb"+str(wellNumber)]["Fluorescence "])
         for i in range(pics):
-            y.append(dataValuesFlu[i][j])
-    # plotting the points
-    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-    # naming the x-axis
-    plt.xlabel('Time ' + '(' + unit + ')')
-    # naming the y-axis
-    plt.ylabel('Fluorescence Intensity (pixels)')
-    # graph title
-    plt.title('Fluorescence growth over incubation period')
-    # showing the plot
-    plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(
-        datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
-    print("done plotting")
+            x.append(timeinterval + (timeinterval * i))
+        plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+        # naming the x-axis
+        plt.xlabel('Time ' + '(' + unit + ')')
+        # naming the y-axis
+        plt.ylabel('Fluorescence Intensity (pixels)')
+        # graph title
+        plt.title('Fluorescence growth over incubation period')
+        # showing the plot
+        plt.savefig(graphPath + '/FluorGraphWell' + str(wellNumber) + ' ' + str(
+            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
+        plt.close()
+        y.clear()
+        x.clear()
 
 
 def FilGraph(timeinterval, pics, unit):
     x = []
     y = []
-    for k in range(pics):
-        x.append(timeinterval + (timeinterval * k))
+
     for wellNumber in range(len(detection.croppedImages)):
         for pictureNumber in range(pics):
             y.append(trueDict["NumPic"+str(pictureNumber)]["WellNumb"+str(wellNumber)]["Filament Radius "])
-        print("X array for fil: ",x)
-        print("Y array for fil: ",y)
+        for k in range(pics):
+            x.append(timeinterval + (timeinterval * k))
+
         # plotting the points
         plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
         # naming the x-axis
         plt.xlabel('Time ' + '(' + unit + ')')
         # naming the y-axis
-        plt.ylabel('Filament Intensity (pixels)')
+        plt.ylabel('Filament size (µm)')
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(1) + ' ' + str(
+        plt.savefig(graphPath + '/FilGraphWell' + str(wellNumber) + ' ' + str(
             datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
-        print("done plotting")
+        plt.close()
+        y.clear()
+        x.clear()
 
 
 def analyzeBrightfield(min_size, n,max_size):
