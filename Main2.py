@@ -37,6 +37,8 @@ AnalysisBool = True
 TrigBool = False
 GraphBool = True
 
+triggered=False
+
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # Set T/F here
@@ -122,12 +124,12 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # HARDWARE TRIGGER
         if TrigBool:
 
-            # if(((filamentSize/cellRadius)*100)>=(max_size)):
+            if(triggered):
 
-            #onTrigger(udpSend)
-            print("TRIGGERED TO STOP/DUMP DROPLETS")
+                #onTrigger(udpSend)
+                print("TRIGGERED TO STOP/DUMP DROPLETS")
 
-            break;
+                break;
         else:
             time.sleep(duration)
 
@@ -135,15 +137,17 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
                   'w') as csv_file:
             writer = csv.writer(csv_file)
-            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
-                             ("Fluorescence(pxls)")])
+            writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"), ("Fluorescence(pxls)"), ("Status")])
             for welldata in range(len(detection.croppedImages)):
                 writer.writerow([
                     str(welldata),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
-                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores '])
-                    ,str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence ']),
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Status '])
+
+
                 ])
 
     end_time = datetime.now()
@@ -228,26 +232,34 @@ def analyzeBrightfield(min_size, n,max_size):
         if len(CellsInsideCroppedImage) > 1:
             # do nothing because well is invalid due to having more than 1 droplet
             print("There is more than 1 droplet inside the well")
-
-            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "TOOMANYDROPLETS",
+            FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
+            filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": filsize,
                                                                  "Droplet Radius ": "Nill",
-                                                                 "# of spores ": "Nill"}
+                                                                 "# of spores ": "Nill",
+                                                                 "Status " : "TOOMANYDROPLETS"}
 
         if len(CellsInsideCroppedImage) < 1:
-            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "NODROPLET",
+            FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
+            filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": filsize,
                                                                  "Droplet Radius ": "Nill",
-                                                                 "# of spores ": "Nill"}
+                                                                 "# of spores ": "Nill",
+                                                                 "Status " : "NODROPLET"}
 
         else:
             if len(CellsInsideCroppedImage) == 1:  # if we
                 print("there is a droplet BUT")
                 if (cv2.contourArea(CellsInsideCroppedImage[0]) < min_size):
+                    FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
+                    filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
                     # if area of our individual droplet is less than 15 then remove them from array
                     print("Droplet too small, do not analyze")
 
-                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
+                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": filsize,
                                                                          "Droplet Radius ": "Nill",
-                                                                         "# of spores ": "Nill"}
+                                                                         "# of spores ": "Nill",
+                                                                         "Status " : "DROPLETTOOSMALL"}
 
                 else:
                     # Record our data
@@ -271,7 +283,8 @@ def analyzeBrightfield(min_size, n,max_size):
                     trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
                         "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
                         "Droplet Radius ": radius,
-                        "# of spores ": len(spores)
+                        "# of spores ": len(spores),
+                        "Status " : "OK"
                         # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
                     }
                     print("we got here")
@@ -283,8 +296,8 @@ def analyzeBrightfield(min_size, n,max_size):
                         filamentSize = filsize * pixelsizeinum
                         dropletRadius = radius * pixelsizeinum
                         if(((filamentSize/dropletRadius)*100)>=(max_size)):
-                            global TrigBool
-                        TrigBool=False
+                            global triggered
+                            triggered=True
 
 
 
