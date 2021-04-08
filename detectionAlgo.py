@@ -75,10 +75,10 @@ def detectDroplets(c_img):
         else:
             contours2.append(contours[i])
 
-    #image_test = c_img.copy()
-    #cv2.drawContours(image_test, contours2, -1, 255, 1) # TEST TO SEE ALL CONTOURS
-    #cv2.imshow('Output', image_test)
-    #cv2.waitKey(0)
+    image_test = c_img.copy()
+    cv2.drawContours(image_test, contours2, -1, 255, 1) # TEST TO SEE ALL CONTOURS
+    cv2.imshow('Output', image_test)
+    cv2.waitKey(0)
 
     out = np.zeros_like(c_img)
     #print(len(contours))

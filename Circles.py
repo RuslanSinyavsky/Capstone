@@ -52,17 +52,17 @@ def detectWells(img, debugbool,path):
     # detectFluores(img)
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minimumdistance,
                                param1=30, param2=20, minRadius=minimumwellradius, maxRadius=100)
-
+    cimgforsaving = cimg.copy()
     circles = np.uint16(np.around(circles))
     if debugbool == True:
         pos=0 #used to number the wells
         # if we're debugging print out the circles over the image
         for i in circles[0, :]:
             # draw the outer circle
-            cv2.circle(cimg, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            cv2.circle(cimgforsaving, (i[0], i[1]), i[2], (0, 255, 0), 2)
             # draw the center of the circle
-            cv2.circle(cimg, (i[0], i[1]), 2, (0, 0, 255), 3)
-            cv2.putText(cimg, str(pos), (i[0],i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA) #REMOVED FOR CONFLICT WITH CONTOUR LOWER DOWN
+            cv2.circle(cimgforsaving, (i[0], i[1]), 2, (0, 0, 255), 3)
+            cv2.putText(cimgforsaving, str(pos), (i[0],i[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA) #REMOVED FOR CONFLICT WITH CONTOUR LOWER DOWN
             pos=pos+1
 
     if debugbool == True:
@@ -71,12 +71,12 @@ def detectWells(img, debugbool,path):
         width = int(img.shape[1] * scale_percent / 100)
         height = int(img.shape[0] * scale_percent / 100)
         dim = (width, height)
-        resized = cv2.resize(cimg, dim, interpolation = cv2.INTER_AREA)
+        resized = cv2.resize(cimgforsaving, dim, interpolation = cv2.INTER_AREA)
         winname = "Debug detectwells"
         cv2.namedWindow(winname)        # Create a named window
         cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
         cv2.imshow(winname, resized)
-        cv2.imwrite(path + '/Data/DetectedWells.tiff',cimg)
+        cv2.imwrite(path + '/Data/DetectedWells.tiff',cimgforsaving)
         cv2.waitKey(0)
 
 

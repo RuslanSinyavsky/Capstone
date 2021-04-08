@@ -26,8 +26,8 @@ Circles.isolateWells(img_BF)  # isolate wells in BF picture
 # Cropping out wells
 croppedImage = Circles.croppedImages[41]  # THE ARRAY OF ISOLATED WELL's first picture [39] has filament
 
-# plt.imshow(croppedImage)
-# plt.show()
+plt.imshow(croppedImage)
+plt.show()
 
 # Detect filament
 

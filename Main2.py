@@ -101,11 +101,11 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
                 detection.detectWells(image_bf, True, stitchedSavingFolder)
 
-            for x in range(len(detection.croppedImages)):
+
                 # Begin BF Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
                 detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-                filamentSize, cellRadius = analyzeBrightfield(min_size, x)
+                filamentSize, cellRadius = analyzeBrightfield(min_size, n)
 
                 pixelsizeinum = 0.3243
                 # converting pixels into micro meters
@@ -115,11 +115,13 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 # Begin FL Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
                 # detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
-                cellFluorescence = analyzeFluorescent(min_size)
+                cellFluorescence = analyzeFluorescent(min_size, n)
 
-                for i in range(len(detection.croppedImages)):
-                    dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
-                    dataValuesSize.setdefault(n, {})[i] = filamentSize
+
+
+
+
+
         # HARDWARE TRIGGER
         if TrigBool:
 
@@ -209,72 +211,73 @@ def FilGraph(timeinterval, pics, unit):
         print("done plotting")
 
 
-def analyzeBrightfield(min_size, x):
-    print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
-    print("WELL NUMBER (X) : ", str(x))
-    dictionarykeyvalue = "NumPic" + str(x)
+def analyzeBrightfield(min_size, n):
+    for x in range(len(detection.croppedImages)):
+        print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
+        print("WELL NUMBER (X) : ", str(x))
+        dictionarykeyvalue = "NumPic" + str(x)
 
-    croppedImage = detection.croppedImages[x]
+        croppedImage = detection.croppedImages[x]
 
-    CellsInsideCroppedImage, spores = algo.detectDroplets(croppedImage.copy())
-    print("# spores ", len(spores))
-    print("# droplets ", len(CellsInsideCroppedImage))
+        CellsInsideCroppedImage, spores = algo.detectDroplets(croppedImage.copy())
+        print("# spores ", len(spores))
+        print("# droplets ", len(CellsInsideCroppedImage))
 
-    # Drolet ruling out criteria
-    if len(CellsInsideCroppedImage) > 1:
-        # do nothing because well is invalid due to having more than 1 droplet
-        print("There is more than 1 droplet inside the well")
+        # Drolet ruling out criteria
+        if len(CellsInsideCroppedImage) > 1:
+            # do nothing because well is invalid due to having more than 1 droplet
+            print("There is more than 1 droplet inside the well")
 
-        trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "TOOMANYDROPLETS",
-                                                             "Droplet Radius ": "Nill",
-                                                             "# of spores ": "Nill"}
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "TOOMANYDROPLETS",
+                                                                 "Droplet Radius ": "Nill",
+                                                                 "# of spores ": "Nill"}
 
-    if len(CellsInsideCroppedImage) < 1:
-        trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "NODROPLET",
-                                                             "Droplet Radius ": "Nill",
-                                                             "# of spores ": "Nill"}
+        if len(CellsInsideCroppedImage) < 1:
+            trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "NODROPLET",
+                                                                 "Droplet Radius ": "Nill",
+                                                                 "# of spores ": "Nill"}
 
-    else:
-        if len(CellsInsideCroppedImage) == 1:  # if we
-            print("there is a droplet BUT")
-            if (cv2.contourArea(CellsInsideCroppedImage[0]) < min_size):
-                # if area of our individual droplet is less than 15 then remove them from array
-                print("Droplet too small, do not analyze")
+        else:
+            if len(CellsInsideCroppedImage) == 1:  # if we
+                print("there is a droplet BUT")
+                if (cv2.contourArea(CellsInsideCroppedImage[0]) < min_size):
+                    # if area of our individual droplet is less than 15 then remove them from array
+                    print("Droplet too small, do not analyze")
 
-                trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
-                                                                     "Droplet Radius ": "Nill",
-                                                                     "# of spores ": "Nill"}
-            else:
-                # Record our data
+                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
+                                                                         "Droplet Radius ": "Nill",
+                                                                         "# of spores ": "Nill"}
+                else:
+                    # Record our data
 
-                # end record
+                    # end record
 
-                # analyze filament
+                    # analyze filament
 
-                FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
-                filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
-                print("Filament size(radius) : ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
+                    FilamentsInsideCroppedImage = algo.detectFilament(croppedImage.copy())
+                    filsize = algo.maxThreshCalc(FilamentsInsideCroppedImage)
+                    print("Filament size(radius) : ", algo.maxThreshCalc(FilamentsInsideCroppedImage))
 
-                # cnt = max(contours_isolated, key=cv2.contourArea)
-                (z, y), radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
-                print("radius of this droplet is = : ", radius)
+                    # cnt = max(contours_isolated, key=cv2.contourArea)
+                    (z, y), radius = cv2.minEnclosingCircle((CellsInsideCroppedImage[0]))
+                    print("radius of this droplet is = : ", radius)
 
-                # storing data into dictionary
+                    # storing data into dictionary
 
-                dataValuesSize.setdefault("Image Number", {})[x] = algo.maxThreshCalc(
-                    FilamentsInsideCroppedImage)
+                    dataValuesSize.setdefault("Image Number", {})[x] = algo.maxThreshCalc(
+                        FilamentsInsideCroppedImage)
 
-                trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
-                    "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
-                    "Droplet Radius ": radius,
-                    "# of spores ": len(spores)
-                    # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
-                }
+                    trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
+                        "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
+                        "Droplet Radius ": radius,
+                        "# of spores ": len(spores)
+                        # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
+                    }
+            dataValuesSize.setdefault(n, {})[x] = filsize #fill stuff for plot
+        return filsize, radius
 
-    return filsize, radius
 
-
-def analyzeFluorescent(min_size):
+def analyzeFluorescent(min_size, n):
     for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
         dropletsinside = algo.detectDroplets(detection.croppedImages[i])
         if len(dropletsinside) > 1:
@@ -290,4 +293,5 @@ def analyzeFluorescent(min_size):
                 # Record our data
                 cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
                 print("Cell fluorescence: ", cellFluorescence)
+        dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
     return cellFluorescence
