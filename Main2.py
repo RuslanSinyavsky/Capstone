@@ -134,7 +134,8 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             time.sleep(duration)
 
         # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
-        with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now()) + '.csv', 'w') as csv_file:
+        with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
+                  'w') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
                              ("Fluorescence(pxls)")])
@@ -182,7 +183,8 @@ def FluorGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Fluorescence growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
+        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(
+            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
         print("done plotting")
 
 
@@ -203,7 +205,8 @@ def FilGraph(timeinterval, pics, unit):
         # graph title
         plt.title('Filament growth over incubation period')
         # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(datetime.now()) + '.png')
+        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(
+            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
         print("done plotting")
 
 
