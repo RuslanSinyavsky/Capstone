@@ -21,8 +21,8 @@ dataValuesSizeT = {}
 # stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
 stitchedSavingFolder = 'C:/capstone'
 trueDict = defaultdict(dict)
-image_bf = cv2.imread(r"C:\capstone\testimage.tif", 0)  # BF image
-
+image_bf = cv2.imread(r"C:\capstone\test2.tif", 0)  # BF image
+image_fl = cv2.imread(r"C:\capstone\test1.png", 0)  # BF image
 '''
 #setup UDP sending protocol for ArduBridge Shell.
 port=7010
@@ -32,15 +32,15 @@ udpSend = False
 if port > 1:
     udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
 '''
-
+ScanBool = False
+AnalysisBool = True
+TrigBool = False
+GraphBool = False
 
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # Set T/F here
-    ScanBool = False
-    AnalysisBool = True
-    TrigBool = False
-    GraphBool = False
+
     '''
     if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
@@ -105,17 +105,14 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 # Begin BF Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
                 detection.isolateWells(image_bf)  # creates array of isolated well images (image with black border)[croppedImages]
-                filamentSize, cellRadius = analyzeBrightfield(min_size, n)
+                analyzeBrightfield(min_size, n,max_size)
 
-                pixelsizeinum = 0.3243
-                # converting pixels into micro meters
-                filamentSize = filamentSize * pixelsizeinum
-                cellRadius = cellRadius * pixelsizeinum
+
 
                 # Begin FL Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
-                # detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
-                #cellFluorescence = analyzeFluorescent(min_size, n)
+                detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
+                analyzeFluorescent(min_size, n)
 
 
 
@@ -127,7 +124,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
             # if(((filamentSize/cellRadius)*100)>=(max_size)):
 
-            # onTrigger(udpSend)
+            #onTrigger(udpSend)
             print("TRIGGERED TO STOP/DUMP DROPLETS")
 
             break;
@@ -145,8 +142,8 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                     str(welldata),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Filament Radius ']),
                     str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Droplet Radius ']),
-                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores ']),
-                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
+                    str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['# of spores '])
+                    #,str(trueDict['NumPic' + str(n)]['WellNumb' + str(welldata)]['Fluorescence '])
                 ])
 
     end_time = datetime.now()
@@ -214,7 +211,7 @@ def FilGraph(timeinterval, pics, unit):
     print("done plotting")
 
 
-def analyzeBrightfield(min_size, n):
+def analyzeBrightfield(min_size, n,max_size):
     for x in range(len(detection.croppedImages)):
         print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
         print("WELL NUMBER (X) : ", str(x))
@@ -250,7 +247,7 @@ def analyzeBrightfield(min_size, n):
                     trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
                                                                          "Droplet Radius ": "Nill",
                                                                          "# of spores ": "Nill"}
-                    return 0, 0
+
                 else:
                     # Record our data
 
@@ -276,13 +273,25 @@ def analyzeBrightfield(min_size, n):
                         "# of spores ": len(spores)
                         # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
                     }
-                    return filsize, radius
+                    print("we got here")
+                    pixelsizeinum = 0.3243
+                    print(filsize)
+                    print(radius)
+                # converting pixels into micro meters
+                    if(filsize):
+                        filamentSize = filsize * pixelsizeinum
+                        dropletRadius = radius * pixelsizeinum
+                        if(((filamentSize/dropletRadius)*100)>=(max_size)):
+                            global TrigBool
+                        TrigBool=False
+
+
 
 
 
 
 def analyzeFluorescent(min_size, n):
-    for i in range(0, len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
+    for i in range(len(detection.croppedImages)):  # might need to loop through circles instead of croppedimages
         dropletsinside = algo.detectDroplets(detection.croppedImages[i])
         if len(dropletsinside) > 1:
             # do nothing because well is invalid due to having more than 1 droplet
@@ -297,5 +306,17 @@ def analyzeFluorescent(min_size, n):
                 # Record our data
                 cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
                 print("Cell fluorescence: ", cellFluorescence)
+                # WRITE OUR CSV FILE HERE AT THE END OF EACH PICTURE(2 channels in this case) TAKEN
+                with open(stitchedSavingFolder + '/Data/ImageData' + str(datetime.now().strftime("%Y%m%d-%H%M%S")) + '.csv',
+                          'w') as csv_file:
+                    writer = csv.writer(csv_file)
+                    writer.writerow([str("Well#"), str("Filament-Radius(um)"), str("Droplet-Radius(um)"), ("#-of-Spores"),
+                                     ("Fluorescence(pxls)")])
+                    for welldata in range(len(detection.croppedImages)):
+                        writer.writerow([
+                            str(welldata)
 
-    return cellFluorescence
+                            ,str(trueDict["NumPic" + str(n)]["WellNumb" + str(welldata)]["Fluorescence "])
+                        ])
+
+
