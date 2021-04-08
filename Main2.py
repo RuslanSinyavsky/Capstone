@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import Circles as detection
 import detectionAlgo as algo
 import cv2
-import stitchingopencv
+#import stitchingopencv
 from collections import defaultdict
 
 # import MiddleMan as middleman
@@ -21,7 +21,7 @@ dataValuesSizeT = {}
 # stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
 stitchedSavingFolder = 'C:/capstone'
 trueDict = defaultdict(dict)
-image_bf = cv2.imread(r"C:\capstone\test2.tif", 0)  # BF image
+image_bf = cv2.imread(r"C:\capstone\test3.tif", 0)  # BF image
 image_fl = cv2.imread(r"C:\capstone\test1.png", 0)  # BF image
 '''
 #setup UDP sending protocol for ArduBridge Shell.
@@ -35,7 +35,7 @@ if port > 1:
 ScanBool = False
 AnalysisBool = True
 TrigBool = False
-GraphBool = False
+GraphBool = True
 
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
@@ -150,6 +150,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     print('End of loop')
     print('Time elapsed:', end_time - start_time)
 
+    print("THIS IS MY SHT", trueDict["NumPic0"]["WellNumb0"]["Filament Radius "])
     # Plotting Graphs
     if GraphBool:
         #FluorGraph(timeinterval, nb_pics, unit)
@@ -189,26 +190,25 @@ def FluorGraph(timeinterval, pics, unit):
 def FilGraph(timeinterval, pics, unit):
     x = []
     y = []
-    for i in range(pics):
-        x.append(timeinterval + (timeinterval * i))
-    for j in range(len(detection.croppedImages)):
-        for i in range(pics):
-            print("datavaluesize : ",dataValuesSize["Image Number"+str(i)][j])
-            y.append(dataValuesSize["Image Number"+str(i)][j])
-    print("X array for fil: ",x)
-    print("Y array for fil: ",y)
-    # plotting the points
-    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-    # naming the x-axis
-    plt.xlabel('Time ' + '(' + unit + ')')
-    # naming the y-axis
-    plt.ylabel('Filament Intensity (pixels)')
-    # graph title
-    plt.title('Filament growth over incubation period')
-    # showing the plot
-    plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(
-        datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
-    print("done plotting")
+    for k in range(pics):
+        x.append(timeinterval + (timeinterval * k))
+    for wellNumber in range(len(detection.croppedImages)):
+        for pictureNumber in range(pics):
+            y.append(trueDict["NumPic"+str(pictureNumber)]["WellNumb"+str(wellNumber)]["Filament Radius "])
+        print("X array for fil: ",x)
+        print("Y array for fil: ",y)
+        # plotting the points
+        plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+        # naming the x-axis
+        plt.xlabel('Time ' + '(' + unit + ')')
+        # naming the y-axis
+        plt.ylabel('Filament Intensity (pixels)')
+        # graph title
+        plt.title('Filament growth over incubation period')
+        # showing the plot
+        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(1) + ' ' + str(
+            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
+        print("done plotting")
 
 
 def analyzeBrightfield(min_size, n,max_size):
