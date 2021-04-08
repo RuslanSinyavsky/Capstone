@@ -77,8 +77,8 @@ def detectDroplets(c_img):
 
     image_test = c_img.copy()
     cv2.drawContours(image_test, contours2, -1, 255, 1) # TEST TO SEE ALL CONTOURS
-    cv2.imshow('Output', image_test)
-    cv2.waitKey(0)
+    #cv2.imshow('Output', image_test)
+    #cv2.waitKey(0)
 
     out = np.zeros_like(c_img)
     #print(len(contours))
@@ -165,9 +165,9 @@ def detectFilament(c_img):
         cv2.circle(th2,center,radius,255,2)
      #   print("we have: ",len(contours))
 
-       # cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
-       # cv2.imshow('Output', c_img_masked)
-       # cv2.waitKey(0)
+        cv2.drawContours(c_img_masked, contours_isolated, -1, 255, 3) #contour our actual filament
+        cv2.imshow('Output', c_img_masked)
+        cv2.waitKey(0)
 
 
     return contours_isolated #returns the contour of the actual filament

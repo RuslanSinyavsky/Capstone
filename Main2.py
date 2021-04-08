@@ -19,7 +19,7 @@ dataValuesFlu = {}
 dataValuesFluT = {}
 dataValuesSizeT = {}
 # stitchedSavingFolder = 'E:/KENZA Folder/CapstoneTests'
-stitchedSavingFolder = 'C:/capstone/Data'
+stitchedSavingFolder = 'C:/capstone'
 trueDict = defaultdict(dict)
 image_bf = cv2.imread(r"C:\capstone\testimage.tif", 0)  # BF image
 
@@ -40,7 +40,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     ScanBool = False
     AnalysisBool = True
     TrigBool = False
-    GraphBool = True
+    GraphBool = False
     '''
     if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
@@ -115,7 +115,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
                 # Begin FL Analysis:
                 detection.croppedImages.clear()  # clear the cropped images to allow for the next
                 # detection.isolateWells(image_fl)  # creates array of isolated well images (image with black border)[croppedImages]
-                cellFluorescence = analyzeFluorescent(min_size, n)
+                #cellFluorescence = analyzeFluorescent(min_size, n)
 
 
 
@@ -155,7 +155,7 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
     # Plotting Graphs
     if GraphBool:
-        FluorGraph(timeinterval, nb_pics, unit)
+        #FluorGraph(timeinterval, nb_pics, unit)
         FilGraph(timeinterval, nb_pics, unit)
 
 
@@ -175,18 +175,18 @@ def FluorGraph(timeinterval, pics, unit):
     for j in range(len(detection.croppedImages)):
         for i in range(pics):
             y.append(dataValuesFlu[i][j])
-        # plotting the points
-        plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-        # naming the x-axis
-        plt.xlabel('Time ' + '(' + unit + ')')
-        # naming the y-axis
-        plt.ylabel('Fluorescence Intensity (pixels)')
-        # graph title
-        plt.title('Fluorescence growth over incubation period')
-        # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(
-            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
-        print("done plotting")
+    # plotting the points
+    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+    # naming the x-axis
+    plt.xlabel('Time ' + '(' + unit + ')')
+    # naming the y-axis
+    plt.ylabel('Fluorescence Intensity (pixels)')
+    # graph title
+    plt.title('Fluorescence growth over incubation period')
+    # showing the plot
+    plt.savefig(stitchedSavingFolder + '/FluorGraphWell' + str(j) + ' ' + str(
+        datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
+    print("done plotting")
 
 
 def FilGraph(timeinterval, pics, unit):
@@ -196,26 +196,29 @@ def FilGraph(timeinterval, pics, unit):
         x.append(timeinterval + (timeinterval * i))
     for j in range(len(detection.croppedImages)):
         for i in range(pics):
-            y.append(dataValuesSize[i][j])
-        # plotting the points
-        plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
-        # naming the x-axis
-        plt.xlabel('Time ' + '(' + unit + ')')
-        # naming the y-axis
-        plt.ylabel('Filament Intensity (pixels)')
-        # graph title
-        plt.title('Filament growth over incubation period')
-        # showing the plot
-        plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(
-            datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
-        print("done plotting")
+            print("datavaluesize : ",dataValuesSize["Image Number"+str(i)][j])
+            y.append(dataValuesSize["Image Number"+str(i)][j])
+    print("X array for fil: ",x)
+    print("Y array for fil: ",y)
+    # plotting the points
+    plt.plot(x, y, marker='o', markerfacecolor='blue', markersize=12)
+    # naming the x-axis
+    plt.xlabel('Time ' + '(' + unit + ')')
+    # naming the y-axis
+    plt.ylabel('Filament Intensity (pixels)')
+    # graph title
+    plt.title('Filament growth over incubation period')
+    # showing the plot
+    plt.savefig(stitchedSavingFolder + '/FilGraphWell' + str(j) + ' ' + str(
+        datetime.now().strftime("%Y%m%d-%H%M%S")) + '.png')
+    print("done plotting")
 
 
 def analyzeBrightfield(min_size, n):
     for x in range(len(detection.croppedImages)):
         print("TOTAL NUMBER OF WELLS : ", len(detection.croppedImages))
         print("WELL NUMBER (X) : ", str(x))
-        dictionarykeyvalue = "NumPic" + str(x)
+        dictionarykeyvalue = "NumPic" + str(n)
 
         croppedImage = detection.croppedImages[x]
 
@@ -247,6 +250,7 @@ def analyzeBrightfield(min_size, n):
                     trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {"Filament Radius ": "DROPLETTOOSMALL",
                                                                          "Droplet Radius ": "Nill",
                                                                          "# of spores ": "Nill"}
+                    return 0, 0
                 else:
                     # Record our data
 
@@ -264,8 +268,7 @@ def analyzeBrightfield(min_size, n):
 
                     # storing data into dictionary
 
-                    dataValuesSize.setdefault("Image Number", {})[x] = algo.maxThreshCalc(
-                        FilamentsInsideCroppedImage)
+                    dataValuesSize.setdefault("Image Number"+str(n), {})[x] = algo.maxThreshCalc(FilamentsInsideCroppedImage)
 
                     trueDict[dictionarykeyvalue]["WellNumb" + str(x)] = {
                         "Filament Radius ": algo.maxThreshCalc(FilamentsInsideCroppedImage),
@@ -273,8 +276,9 @@ def analyzeBrightfield(min_size, n):
                         "# of spores ": len(spores)
                         # ,"Fluorescence ": detectionAlgo.intensityFluores(croppedImage)
                     }
-            dataValuesSize.setdefault(n, {})[x] = filsize #fill stuff for plot
-        return filsize, radius
+                    return filsize, radius
+
+
 
 
 def analyzeFluorescent(min_size, n):
@@ -293,5 +297,5 @@ def analyzeFluorescent(min_size, n):
                 # Record our data
                 cellFluorescence = algo.intensityFluores(detection.croppedImages[i].copy())
                 print("Cell fluorescence: ", cellFluorescence)
-        dataValuesFlu.setdefault(n, {})[i] = cellFluorescence
+
     return cellFluorescence
