@@ -3,10 +3,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 import cv2
 import time, math
-import os, sys
+import os, sys, re
 from PIL import Image
 from math import sqrt
 from pathlib import Path
+
 
 bridge = Bridge()
 
@@ -41,12 +42,18 @@ def merge_imagesHorizontal(file1, file2):
 def concat_tile(im_list_2d):
     return cv2.vconcat([cv2.hconcat(im_list_h) for im_list_h in im_list_2d])
 
+#runnumber = 0
 def hook_bf(event):
         time.sleep(1)
         return event
 
 def hook_fn(event, bridge, event_queue):
         time.sleep(0)
+        #global runnumber
+        #if runnumber == 0:
+        #    print("in runnumber")
+        #    time.sleep(3)
+        #runnumber=runnumber+1
         return event
 
 def hook_fl(event):
@@ -87,9 +94,23 @@ def acquireImage(channelGroup,channelName, hook):
         #acquire a 2 x 1 grid
         #acq.acquire({'row': 0, 'col': 0})
         #acq.acquire({'row': 1, 'col': 0})
+    
+    stackfolder = "**/*"
     folder = Path(directoryPATH)
-    highest = max((file.stem) for file in folder.glob('saving_name_*'))
-    print(highest) #saving_name_# where #is highest number
+    foldernames = []
+    for name in folder.glob('saving_name_*'):
+        print (name.stem)
+        foldernames.append(name.stem)
+    maximum =1
+    for file in foldernames:
+        number = int(re.search(nameofSAVEDFILE+"_"+'(\d*)', file).group(1))  # assuming filename is "filexxx.txt"
+        # compare num to previous max, e.g.
+        maximum= number if number > maximum else maximum  # set max = 0 before for-loop
+        print(number)
+
+    highest = nameofSAVEDFILE + "_" + str(maximum)
+
+
     data_path = os.path.join(folder, highest)
 
     dataset = Dataset(data_path)
@@ -99,6 +120,7 @@ def acquireImage(channelGroup,channelName, hook):
     #data_path=str(directoryPATH/saving_name)
     dataset = Dataset(data_path)
     print(dataset.axes)
+    print("data_path", data_path)
 
     length=(len(xyz))
 
@@ -112,7 +134,7 @@ def acquireImage(channelGroup,channelName, hook):
         sizeimg = cv2.cvtColor(sizeimg,cv2.COLOR_GRAY2RGB)
         h,w,c = sizeimg.shape
     length=int((sqrt(length))) #size of the grid (row or column should be same technically)
-    blank_image = np.ones((h*(length+1),w*(length+1),3), np.uint16)
+    blank_image = np.zeros((h*(math.ceil(math.sqrt(length))+2),w*(math.ceil(math.sqrt(length))+2),3), np.uint16)
 
 
     print("image size ",blank_image.shape)
@@ -156,8 +178,8 @@ def acquireImage(channelGroup,channelName, hook):
         print("Yoffset ",yoffset_px)
         #print("img max Y ",blank_image.shape[1])
 
-
-        blank_image[xoffset_px:xoffset_px+(img.shape[1]), yoffset_px:yoffset_px+(img.shape[0])] += img
+        alpha=0
+        blank_image[xoffset_px:xoffset_px+(img.shape[1]), yoffset_px:yoffset_px+(img.shape[0])] = cv2.addWeighted(blank_image[xoffset_px:xoffset_px+(img.shape[1]), yoffset_px:yoffset_px+(img.shape[0])],alpha,img,1-alpha,0)
         #blank_image[:yoffset_px+img.shape[0], :xoffset_px+img.shape[1]] = img
         #blank_image = cv2.addWeighted(blank_image[yoffset_px:yoffset_px+img.shape[0], xoffset_px:xoffset_px+img.shape[1]],img)
 
@@ -181,6 +203,7 @@ def acquireImage(channelGroup,channelName, hook):
     cv2.imshow(winname, resized)
     cv2.waitKey(0)
     '''
+    blank_image = cv2.cvtColor(blank_image,cv2.COLOR_BGR2GRAY)
     return blank_image , pixelsizeinum
     #plt.savefig('foo.png')
     #plt.show()

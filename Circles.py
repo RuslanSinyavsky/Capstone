@@ -46,6 +46,7 @@ def detectWells(img, debugbool,path):
     minimumwellradius = 80
 
     #img = cv2.medianBlur(img, 5)
+    print("image type:", img.shape)
     #cimg = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     cimg=img
 
@@ -73,11 +74,11 @@ def detectWells(img, debugbool,path):
         dim = (width, height)
         resized = cv2.resize(cimgforsaving, dim, interpolation = cv2.INTER_AREA)
         winname = "Debug detectwells"
-        cv2.namedWindow(winname)        # Create a named window
-        cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
-        cv2.imshow(winname, resized)
+        #cv2.namedWindow(winname)        # Create a named window
+        #cv2.moveWindow(winname, 1000,1000)  # Move it to (40,30)
+        #cv2.imshow(winname, resized)
         cv2.imwrite(path + '/Data/DetectedWells.tiff',cimgforsaving)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
 
 
 

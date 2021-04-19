@@ -11,8 +11,19 @@ import stitchingopencv
 from collections import defaultdict
 
 # import MiddleMan as middleman
-# from GSOF_ArduBridge import UDP_Send
+from GSOF_ArduBridge import UDP_Send
 
+
+
+#user set parameters
+ScanBool = True
+AnalysisBool = True
+TrigBool = True
+GraphBool = True
+
+
+####init####
+triggered=False
 duration = 0
 dataValuesSize = {}
 dataValuesFlu = {}
@@ -30,11 +41,11 @@ graphPath = 'E:/KENZA Folder/CapstoneTests/Graph'
 #stitchedSavingFolder = 'C:/capstone'
 #graphPath = 'C:/capstone/Graph'
 
-#image_bf = cv2.imread(r"C:\capstone\test3.tif", 0)  # BF image for use when testing without acquiring image
-#image_fl = cv2.imread(r"C:\capstone\test1.png", 0)  # fl image
+#image_bf = cv2.imread("E:/KENZA Folder/CapstoneTests/Fused_bf2.tif", 0)  # BF image for use when testing without acquiring image
+#image_fl = cv2.imread("E:/KENZA Folder/CapstoneTests/Fused_fluor.tif", 0)  # fl image
 trueDict = defaultdict(dict)
 
-'''
+
 #setup UDP sending protocol for ArduBridge Shell.
 port=7010
 ip='127.0.0.1'
@@ -42,18 +53,11 @@ print('UDP active on port '+str(port))
 udpSend = False
 if port > 1:
     udpSend = UDP_Send.udpSend(nameID='', DesIP=ip, DesPort=port)
-'''
-ScanBool = False
-AnalysisBool = True
-TrigBool = False
-GraphBool = True
 
-triggered=False
 
 # statusUpdate("Scanning image")
 def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
     # Set T/F here
-
     '''
     if check == 1:  #Exlude empty droplets
         print("Exclude empty droplets")
@@ -82,13 +86,18 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             # ----
             image_bf, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "BF",pycrocontrol.hook_bf)  # acquire BF on the ESP-XLED channel group
             BrightfieldStitchedPath = "{}\BF-{}.png".format(stitchedSavingFolder, n)
+            cv2.imwrite(stitchedSavingFolder + "/BF-Storage.png", image_bf)
             cv2.imwrite(BrightfieldStitchedPath, image_bf)
+            image_bf = cv2.imread("E:/KENZA Folder/CapstoneTests/BF-Storage.png", 0)
+            
             # ----
             # FLUORESCENT
             # ----
             image_fl, pixelsizeinum = pycrocontrol.acquireImage("ESP-XLED", "Resorufin",pycrocontrol.hook_fl)  # acquire FL on the ESP-XLED channel group
             FluorescentStitchedPath = "{}\Fluo-{}.png".format(stitchedSavingFolder, n)
+            cv2.imwrite(stitchedSavingFolder + "/Fluo-Storage.png", image_fl)
             cv2.imwrite(FluorescentStitchedPath, image_fl)
+            image_fl = cv2.imread("E:/KENZA Folder/CapstoneTests/Fluo-Storage.png", 0) 
             '''
             # ----
             # BOTH
@@ -109,10 +118,11 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
         # todo#######
 
         # IMAGE ANALYSIS STAGE
+        #image_bf = cv2.imread("E:/KENZA Folder/CapstoneTests/BF-0.png", 0)  # BF image for use when testing without acquiring image
+        #image_fl = cv2.imread("E:/KENZA Folder/CapstoneTests/Fluo-0.png", 0)  # fl image
         if AnalysisBool:
             if (n == 0):  # if it's our first loop we want to set up the wells area (fills circles array)
                 detection.detectWells(image_bf, True, stitchedSavingFolder)
-
 
             # Begin BF Analysis:
             detection.croppedImages.clear()  # clear the cropped images to allow for the next
@@ -124,19 +134,14 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
             analyzeFluorescent(min_size, n)
 
 
-
-
-
-
         # HARDWARE TRIGGER
         if TrigBool:
-
             if(triggered):
-
-                #onTrigger(udpSend)
+                onTrigger(udpSend)
                 print("TRIGGERED TO STOP/DUMP DROPLETS")
-
-                break;
+                if nb_pics >0:
+                    nb_pictures=nb_pics
+                nb_pics=0
         else:
             time.sleep(duration)
 
@@ -161,8 +166,8 @@ def RunSetup(nb_pics, timeinterval, unit, max_size, min_size):
 
     # Plotting Graphs
     if GraphBool:
-        FluorGraph(timeinterval, nb_pics, unit)
-        FilGraph(timeinterval, nb_pics, unit)
+        FluorGraph(timeinterval, nb_pictures, unit)
+        FilGraph(timeinterval, nb_pictures, unit)
 
 
 def onTrigger(udp):
@@ -236,7 +241,7 @@ def analyzeBrightfield(min_size, n,max_size):
         print("# spores ", len(spores))
         print("# droplets ", len(CellsInsideCroppedImage))
 
-        # Drolet ruling out criteria
+        # Droplet ruling out criteria
         if len(CellsInsideCroppedImage) > 1:
             # do nothing because well is invalid due to having more than 1 droplet
             print("There is more than 1 droplet inside the well")
@@ -306,10 +311,6 @@ def analyzeBrightfield(min_size, n,max_size):
                         if(((filamentSize/dropletRadius)*100)>=(max_size)):
                             global triggered
                             triggered=True
-
-
-
-
 
 
 def analyzeFluorescent(min_size, n):
